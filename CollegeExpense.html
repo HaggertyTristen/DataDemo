@@ -1,506 +1,192 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
   <title>College Budget & Calendar</title>
   <style>
-    :root{
-      --bg:#f4f7fb;
-      --panel:#ffffff;
-      --muted:#6b7280;
-      --text:#0f1724;
-      --accent:#1f77b4;      /* soft blue */
-      --accent-2:#22c55e;    /* green */
-      --danger:#ef4444;
-      --card-radius:12px;
-      --pad:16px;
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+      color: #333;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
-      background:var(--bg);
-      color:var(--text);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      line-height:1.45;
+    h1, h2 {
+      text-align: center;
     }
-
-    /* Header */
-    header{
-      background:linear-gradient(90deg,var(--panel),#f0f4f8);
-      border-bottom:1px solid rgba(15,23,36,0.06);
-      padding:18px var(--pad);
-      display:flex;
-      align-items:center;
-      gap:12px;
-      box-shadow:0 2px 6px rgba(16,24,40,0.03);
+    .container {
+      max-width: 900px;
+      margin: auto;
     }
-    .brand {
-      display:flex;align-items:center;gap:12px;
+    .card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
-    .logo{
-      width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#6fb1e7);
-      display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:18px;
-      box-shadow:0 4px 14px rgba(31,119,180,0.12);
+    input, select, button {
+      padding: 8px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 100%;
     }
-    h1{font-size:18px;margin:0}
-    .header-right{margin-left:auto;color:var(--muted);font-size:14px}
-
-    /* Layout */
-    .container{max-width:1100px;margin:22px auto;padding:0 var(--pad);display:grid;grid-template-columns:1fr 380px;gap:18px}
-    @media (max-width:980px){ .container{ grid-template-columns:1fr } }
-
-    /* Left column */
-    .panel{background:var(--panel);border-radius:var(--card-radius);padding:14px;box-shadow:0 6px 18px rgba(12,18,30,0.04);border:1px solid rgba(15,23,36,0.04)}
-    .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-    .muted{color:var(--muted);font-size:13px}
-    .small{font-size:13px;color:var(--muted)}
-
-    /* Expense form */
-    .expense-form{display:grid;grid-template-columns:1fr 120px 100px 80px;gap:10px;align-items:center}
-    .expense-form input, .expense-form select, .expense-form button{
-      padding:10px;border-radius:10px;border:1px solid rgba(15,23,36,0.06);font-size:14px;background:transparent;
+    button {
+      background: #2d89ef;
+      color: #fff;
+      border: none;
+      cursor: pointer;
     }
-    .expense-form button{background:linear-gradient(90deg,var(--accent),#5fb0e6);border:none;color:white;font-weight:700;cursor:pointer}
-    @media (max-width:680px){ .expense-form{grid-template-columns:1fr 120px; } .expense-form button{grid-column:1 / -1} }
-
-    /* Table */
-    table{width:100%;border-collapse:collapse;margin-top:12px}
-    th,td{padding:10px;border-bottom:1px solid rgba(15,23,36,0.04);text-align:left;font-size:14px}
-    th{color:var(--muted);font-size:13px}
-    td.amount{text-align:right;font-weight:700}
-
-    /* KPIs */
-    .kpis{display:flex;gap:10px;margin-top:12px}
-    .kpi{flex:1;background:linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));padding:12px;border-radius:10px;text-align:center}
-    .kpi .num{font-weight:800;font-size:16px}
-    .kpi .lbl{color:var(--muted);font-size:13px}
-
-    /* Progress */
-    .progress{background:rgba(15,23,36,0.04);border-radius:999px;height:14px;overflow:hidden;margin-top:8px}
-    .progress > div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));text-align:right;padding-right:8px;color:#04101a;font-weight:700;font-size:12px;line-height:14px}
-
-    /* Right column: calendar & chart */
-    .calendar-controls{display:flex;gap:8px;align-items:center}
-    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:10px}
-    .cal-day{background:linear-gradient(180deg,white, #fcfdff);border:1px solid rgba(15,23,36,0.04);padding:8px;border-radius:8px;min-height:88px;position:relative;cursor:pointer}
-    .cal-day .dnum{position:absolute;top:8px;right:8px;color:var(--muted);font-size:12px}
-    .evt{display:block;margin-top:26px;padding:6px;border-radius:8px;font-weight:700;font-size:13px;color:#071022}
-    .evt.tuition{background:#ffe8cc}
-    .evt.rent{background:#ffd6d6}
-    .evt.textbooks{background:#e8ffe9}
-    .evt.food{background:#e6f0ff}
-    .evt.other{background:#f0e9ff}
-
-    /* Modal */
-    .modal-back{position:fixed;inset:0;background:rgba(2,6,23,0.5);display:flex;align-items:center;justify-content:center;visibility:hidden;opacity:0;transition:opacity .15s}
-    .modal-back.show{visibility:visible;opacity:1}
-    .modal{width:460px;background:var(--panel);padding:16px;border-radius:12px;border:1px solid rgba(15,23,36,0.06)}
-    .modal h3{margin:0 0 6px 0}
-    .row{display:flex;gap:8px}
-    .row .col{flex:1}
-
-    /* footer */
-    footer{max-width:1100px;margin:20px auto;padding:10px var(--pad);color:var(--muted);font-size:13px;text-align:center}
+    button:hover {
+      background: #1c5fb8;
+    }
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+    .day {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      min-height: 80px;
+      padding: 5px;
+      font-size: 12px;
+      position: relative;
+    }
+    .day span {
+      font-weight: bold;
+    }
+    .expense-tag {
+      display: block;
+      background: #ffdfdf;
+      color: #a00;
+      padding: 2px 4px;
+      border-radius: 4px;
+      margin-top: 2px;
+      font-size: 11px;
+      word-break: break-word;
+    }
+    ul {
+      padding-left: 20px;
+    }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>College Expense & Calendar Tracker</h1>
 
-<header>
-  <div class="brand">
-    <div class="logo">CB</div>
-    <div>
-      <h1>College Budget</h1>
-      <div class="muted">Simple expenses • Monthly calendar</div>
+    <!-- Budget Card -->
+    <div class="card">
+      <h2>Set Monthly Budget</h2>
+      <input type="number" id="budgetInput" placeholder="Enter monthly budget ($)">
+      <button onclick="setBudget()">Save Budget</button>
+      <p id="budgetDisplay"></p>
+    </div>
+
+    <!-- Expense Form -->
+    <div class="card">
+      <h2>Add Expense</h2>
+      <input type="text" id="expenseName" placeholder="Expense Name (e.g. Rent)">
+      <input type="number" id="expenseAmount" placeholder="Amount ($)">
+      <input type="date" id="expenseDate">
+      <button onclick="addExpense()">Add Expense</button>
+    </div>
+
+    <!-- Expense List -->
+    <div class="card">
+      <h2>Expenses</h2>
+      <ul id="expenseList"></ul>
+    </div>
+
+    <!-- Calendar -->
+    <div class="card">
+      <h2>Calendar</h2>
+      <div class="calendar" id="calendar"></div>
     </div>
   </div>
-  <div class="header-right small">Auto-saved in your browser • Private</div>
-</header>
 
-<main class="container">
-  <!-- LEFT: expenses & overview -->
-  <section class="panel">
-    <div class="section-title">
-      <div>
-        <strong style="font-size:16px">Expenses</strong>
-        <div class="small">Add your expenses (date, category, amount)</div>
-      </div>
-      <div>
-        <label class="small muted">View month</label>
-        <input id="monthPicker" type="month" style="padding:8px;border-radius:8px;border:1px solid rgba(15,23,36,0.04)">
-      </div>
-    </div>
+  <script>
+    let budget = 0;
+    let expenses = [];
 
-    <div class="expense-form" style="margin-top:8px">
-      <input id="expName" placeholder="Description (e.g., Rent, Textbook)">
-      <input id="expDate" type="date" value="">
-      <select id="expCategory">
-        <option value="rent">Rent</option>
-        <option value="tuition">Tuition</option>
-        <option value="textbooks">Textbooks</option>
-        <option value="food">Food</option>
-        <option value="other">Other</option>
-      </select>
-      <div style="display:flex;gap:8px">
-        <input id="expAmount" type="number" placeholder="Amount" style="padding:8px;border-radius:8px;border:1px solid rgba(15,23,36,0.04);flex:1">
-        <button id="addExpBtn" style="min-width:64px;padding:8px;border-radius:8px">Add</button>
-      </div>
-    </div>
+    function setBudget() {
+      budget = parseFloat(document.getElementById("budgetInput").value) || 0;
+      document.getElementById("budgetDisplay").textContent = "Monthly Budget: $" + budget.toFixed(2);
+    }
 
-    <div class="kpis" style="margin-top:16px">
-      <div class="kpi">
-        <div class="num" id="totalSpent">$0</div>
-        <div class="lbl">Total this month</div>
-      </div>
-      <div class="kpi">
-        <div class="num" id="budgetVal">$0</div>
-        <div class="lbl">Monthly Budget</div>
-      </div>
-      <div class="kpi">
-        <div class="num" id="remainingVal">$0</div>
-        <div class="lbl">Remaining</div>
-      </div>
-    </div>
+    function addExpense() {
+      const name = document.getElementById("expenseName").value;
+      const amount = parseFloat(document.getElementById("expenseAmount").value);
+      const date = document.getElementById("expenseDate").value;
 
-    <div style="margin-top:12px">
-      <div class="small muted">Set monthly budget</div>
-      <div style="display:flex;gap:8px;margin-top:6px">
-        <input id="budgetInput" type="number" placeholder="e.g., 1200" style="padding:8px;border-radius:8px;border:1px solid rgba(15,23,36,0.04);flex:1">
-        <button id="setBudgetBtn" style="padding:8px;border-radius:8px">Set</button>
-      </div>
-      <div class="progress" style="margin-top:8px">
-        <div id="budgetBar" style="width:0%">0%</div>
-      </div>
-    </div>
+      if (!name || !amount || !date) {
+        alert("Please fill out all fields.");
+        return;
+      }
 
-    <div style="margin-top:14px" class="small muted">Expenses for selected month</div>
-    <div style="margin-top:8px" class="table">
-      <table>
-        <thead><tr><th>When</th><th>Item</th><th>Category</th><th style="text-align:right">Amount</th></tr></thead>
-        <tbody id="expensesTableBody"></tbody>
-      </table>
-    </div>
-  </section>
+      const expense = { name, amount, date };
+      expenses.push(expense);
+      updateExpenseList();
+      renderCalendar();
 
-  <!-- RIGHT: calendar & small chart -->
-  <aside>
-    <section class="panel">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <strong>Calendar</strong>
-          <div class="small muted">Click a day to add or edit events</div>
-        </div>
-        <div class="calendar-controls">
-          <button id="prevM" style="padding:8px;border-radius:8px" class="small muted">◀</button>
-          <button id="nextM" style="padding:8px;border-radius:8px" class="small muted">▶</button>
-        </div>
-      </div>
+      document.getElementById("expenseName").value = "";
+      document.getElementById("expenseAmount").value = "";
+      document.getElementById("expenseDate").value = "";
+    }
 
-      <div id="calendarGrid" class="cal-grid" style="margin-top:10px"></div>
-    </section>
+    function updateExpenseList() {
+      const list = document.getElementById("expenseList");
+      list.innerHTML = "";
+      expenses.forEach(exp => {
+        const li = document.createElement("li");
+        li.textContent = `${exp.date} - ${exp.name}: $${exp.amount.toFixed(2)}`;
+        list.appendChild(li);
+      });
+    }
 
-    <section class="panel" style="margin-top:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <strong>Quick summary</strong>
-        <button id="clearBtn" style="padding:6px;border-radius:8px;background:transparent;border:1px solid rgba(15,23,36,0.04)" class="small muted">Reset</button>
-      </div>
-      <div style="margin-top:10px" class="small muted">Categories (monthly total)</div>
-      <div id="categorySummary" style="margin-top:10px"></div>
-    </section>
-  </aside>
-</main>
+    function renderCalendar() {
+      const calendar = document.getElementById("calendar");
+      calendar.innerHTML = "";
 
-<!-- Modal for event add/edit -->
-<div id="modal" class="modal-back">
-  <div class="modal">
-    <h3 id="modalTitle">Add / Edit Event</h3>
-    <div style="margin-top:8px" class="small muted">Date</div>
-    <input id="modalDate" type="date" style="padding:8px;border-radius:8px;border:1px solid rgba(15,23,36,0.04);width:100%" />
-    <div style="margin-top:8px" class="small muted">Title</div>
-    <input id="modalTitleInput" placeholder="e.g., Pay rent, Library due" style="padding:8px;border-radius:8px;border:1px solid rgba(15,23,36,0.04);width:100%" />
-    <div style="margin-top:8px" class="small muted">Category</div>
-    <select id="modalCategory" style="padding:8px;border-radius:8px;border:1px solid rgba(15,23,36,0.04);width:100%">
-      <option value="rent">Rent</option>
-      <option value="tuition">Tuition</option>
-      <option value="textbooks">Textbooks</option>
-      <option value="food">Food</option>
-      <option value="other">Other</option>
-    </select>
-    <div style="margin-top:8px" class="small muted">Amount (optional)</div>
-    <input id="modalAmount" type="number" placeholder="e.g., 800" style="padding:8px;border-radius:8px;border:1px solid rgba(15,23,36,0.04);width:100%" />
-    <div style="margin-top:8px" class="small muted">Notes</div>
-    <textarea id="modalNotes" rows="3" style="padding:8px;border-radius:8px;border:1px solid rgba(15,23,36,0.04);width:100%"></textarea>
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth();
 
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-      <button id="deleteEventBtn" style="background:var(--danger);color:white;padding:8px;border-radius:8px;border:none">Delete</button>
-      <button id="saveEventBtn" style="background:var(--accent);color:white;padding:8px;border-radius:8px;border:none">Save</button>
-      <button id="closeModalBtn" style="background:transparent;border:1px solid rgba(15,23,36,0.04);padding:8px;border-radius:8px">Cancel</button>
-    </div>
-  </div>
-</div>
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-<footer>College Budget & Calendar — Simple, private, no accounts. Data saved locally in your browser.</footer>
+      // Empty days before start
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement("div");
+        calendar.appendChild(empty);
+      }
 
-<script>
-/* ========== Simple, professional college expense + calendar ========== */
-/* Storage model:
-   state = {
-     budget: { 'YYYY-MM': number },    // monthly budgets
-     expenses: [ {id, name, date:'YYYY-MM-DD', category, amount} ],
-     events: { 'YYYY-MM-DD': [ {id,title,category,amount,notes} ] }
-   }
-*/
-const KEY = 'college_budget_calendar_v1';
-let state = loadState();
+      // Days
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dayBox = document.createElement("div");
+        dayBox.className = "day";
+        dayBox.innerHTML = `<span>${d}</span>`;
 
-function loadState(){
-  try {
-    const raw = localStorage.getItem(KEY);
-    if(raw) return JSON.parse(raw);
-  } catch(e){}
-  return { budget: {}, expenses: [], events: {} };
-}
-function saveState(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+        const dayDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 
-/* Utilities */
-const el = id => document.getElementById(id);
-const fmt = n => n.toLocaleString(undefined,{style:'currency',currency:'USD'});
-const uid = () => 'id-' + Math.random().toString(36).slice(2,9);
+        expenses.forEach(exp => {
+          if (exp.date === dayDate) {
+            const tag = document.createElement("span");
+            tag.className = "expense-tag";
+            tag.textContent = `${exp.name} $${exp.amount}`;
+            dayBox.appendChild(tag);
+          }
+        });
 
-/* Current view month */
-let view = (() => {
-  const now = new Date();
-  return { year: now.getFullYear(), month: now.getMonth() }; // month 0-index
-})();
+        calendar.appendChild(dayBox);
+      }
+    }
 
-function monthKey(y,m){ return `${y}-${String(m+1).padStart(2,'0')}`; }
-function dateKey(d){ // input/Date => YYYY-MM-DD
-  if(typeof d === 'string' && d.includes('-')) return d;
-  const D = new Date(d);
-  return `${D.getFullYear()}-${String(D.getMonth()+1).padStart(2,'0')}-${String(D.getDate()).padStart(2,'0')}`;
-}
-
-/* Initialize UI elements */
-(function init(){
-  // set month picker default
-  const mk = monthKey(view.year, view.month);
-  el('monthPicker').value = mk;
-  el('monthPicker').addEventListener('change', e => {
-    const [y,m] = e.target.value.split('-').map(Number);
-    view.year = y; view.month = m-1;
-    renderAll();
-  });
-
-  // init date default for quick-expense
-  const today = new Date();
-  el('expDate').value = dateKey(today);
-
-  // buttons
-  el('addExpBtn').addEventListener('click', addExpenseFromForm);
-  el('setBudgetBtn').addEventListener('click', setMonthlyBudget);
-  el('prevM').addEventListener('click', ()=>{ changeMonth(-1); });
-  el('nextM').addEventListener('click', ()=>{ changeMonth(1); });
-  el('clearBtn').addEventListener('click', ()=>{ if(confirm('Clear all saved data?')){ state = {budget:{},expenses:[],events:{}}; saveState(); renderAll(); } });
-
-  // modal
-  el('closeModalBtn').addEventListener('click', closeModal);
-  el('saveEventBtn').addEventListener('click', saveEventFromModal);
-  el('deleteEventBtn').addEventListener('click', deleteEventFromModal);
-
-  // keyboard ESC closes modal
-  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
-
-  renderAll();
-})();
-
-/* ====== Expenses ====== */
-function addExpenseFromForm(){
-  const name = el('expName').value.trim();
-  const date = el('expDate').value;
-  const category = el('expCategory').value;
-  const amount = parseFloat(el('expAmount').value);
-  if(!name || !date || !category || !amount || amount <= 0) {
-    alert('Please fill name, date, category and a positive amount');
-    return;
-  }
-  state.expenses.push({ id: uid(), name, date, category, amount });
-  saveState();
-  el('expName').value=''; el('expAmount').value=''; // keep date
-  renderAll();
-}
-
-/* ====== Budget ====== */
-function setMonthlyBudget(){
-  const val = parseFloat(el('budgetInput').value);
-  if(!val || val <= 0){ alert('Enter a positive budget'); return; }
-  const key = monthKey(view.year, view.month);
-  state.budget[key] = val;
-  saveState();
-  el('budgetInput').value = '';
-  renderAll();
-}
-
-/* ====== Calendar & Events ====== */
-let modalContext = { date:null, index:null };
-
-function changeMonth(delta){
-  view.month += delta;
-  if(view.month < 0){ view.month = 11; view.year -= 1; }
-  if(view.month > 11){ view.month = 0; view.year += 1; }
-  el('monthPicker').value = monthKey(view.year, view.month);
-  renderAll();
-}
-
-function renderCalendar(){
-  const grid = el('calendarGrid'); grid.innerHTML = '';
-  const first = new Date(view.year, view.month, 1);
-  const startDow = first.getDay(); // 0 Sun
-  const daysIn = new Date(view.year, view.month+1, 0).getDate();
-
-  // optional: show day headers (Mon-Sun) — keep minimal for simplicity
-  // fill blanks
-  for(let i=0;i<startDow;i++){
-    const blank = document.createElement('div'); blank.className = 'cal-day'; blank.style.opacity = 0.35; grid.appendChild(blank);
-  }
-
-  for(let d=1; d<=daysIn; d++){
-    const dateStr = `${view.year}-${String(view.month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const node = document.createElement('div'); node.className='cal-day';
-    node.innerHTML = `<div class="dnum">${d}</div>`;
-    // recurring: optionally show if any event exists or expense
-    const dayEvents = state.events[dateStr] || [];
-    dayEvents.forEach((ev, idx) => {
-      const e = document.createElement('span');
-      e.className = 'evt ' + (ev.category || 'other');
-      e.textContent = ev.title + (ev.amount ? (' • ' + fmt(ev.amount)) : '');
-      e.title = ev.notes || '';
-      e.addEventListener('click', (evt) => { evt.stopPropagation(); openModal(dateStr, idx); });
-      node.appendChild(e);
-    });
-    node.addEventListener('click', ()=> openModal(dateStr, null));
-    grid.appendChild(node);
-  }
-}
-
-/* ====== Modal: add/edit event ====== */
-function openModal(date, idx=null){
-  modalContext.date = date; modalContext.index = idx;
-  el('modalDate').value = date;
-  if(idx === null){
-    el('modalTitle').textContent = 'Add Event';
-    el('modalTitleInput').value = '';
-    el('modalCategory').value = 'rent';
-    el('modalAmount').value = '';
-    el('modalNotes').value = '';
-    el('deleteEventBtn').style.display = 'none';
-  } else {
-    const ev = state.events[date][idx];
-    el('modalTitle').textContent = 'Edit Event';
-    el('modalTitleInput').value = ev.title || '';
-    el('modalCategory').value = ev.category || 'other';
-    el('modalAmount').value = ev.amount || '';
-    el('modalNotes').value = ev.notes || '';
-    el('deleteEventBtn').style.display = 'inline-block';
-  }
-  document.querySelector('.modal-back').classList.add('show');
-}
-
-function closeModal(){
-  document.querySelector('.modal-back').classList.remove('show');
-  modalContext = { date:null, index:null };
-}
-
-function saveEventFromModal(){
-  const date = el('modalDate').value;
-  const title = el('modalTitleInput').value.trim();
-  const category = el('modalCategory').value;
-  const amount = parseFloat(el('modalAmount').value) || 0;
-  const notes = el('modalNotes').value.trim();
-
-  if(!title || !date){ alert('Please provide title and date'); return; }
-  if(!state.events[date]) state.events[date] = [];
-  if(modalContext.index === null){
-    state.events[date].push({ id: uid(), title, category, amount, notes });
-  } else {
-    state.events[date][modalContext.index] = Object.assign({}, state.events[date][modalContext.index], { title, category, amount, notes });
-  }
-  saveState();
-  closeModal();
-  renderAll();
-}
-
-function deleteEventFromModal(){
-  if(modalContext.index === null) return;
-  const date = el('modalDate').value;
-  state.events[date].splice(modalContext.index, 1);
-  if(state.events[date].length === 0) delete state.events[date];
-  saveState();
-  closeModal();
-  renderAll();
-}
-
-/* ====== Rendering expenses & summaries ====== */
-function renderExpensesList(){
-  const tbody = el('expensesTableBody'); tbody.innerHTML = '';
-  const key = monthKey(view.year, view.month);
-  const monthPrefix = key + '-';
-  const monthExpenses = state.expenses.filter(e => e.date.startsWith(monthPrefix)).sort((a,b)=>a.date.localeCompare(b.date));
-  monthExpenses.forEach(e => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td style="width:120px">${e.date}</td><td>${escapeHtml(e.name)}</td><td>${escapeHtml(e.category)}</td><td class="amount">${fmt(e.amount)}</td>`;
-    tbody.appendChild(tr);
-  });
-
-  const total = monthExpenses.reduce((s,x)=>s+x.amount,0);
-  el('totalSpent').textContent = fmt(total);
-  const b = state.budget[key] || 0;
-  el('budgetVal').textContent = fmt(b || 0);
-  el('remainingVal').textContent = fmt( Math.max(0, (b||0) - total) );
-  // progress
-  const pct = b ? Math.min(100, Math.round((total / b) * 100)) : 0;
-  const bar = el('budgetBar'); bar.style.width = pct + '%'; bar.textContent = pct + '%';
-  bar.style.background = pct >= 100 ? 'linear-gradient(90deg,var(--danger),#ff7b7b)' : 'linear-gradient(90deg,var(--accent),var(--accent-2))';
-}
-
-function renderCategorySummary(){
-  const wrap = el('categorySummary'); wrap.innerHTML = '';
-  const key = monthKey(view.year, view.month), prefix = key + '-';
-  const monthExpenses = state.expenses.filter(e => e.date.startsWith(prefix));
-  const byCat = {};
-  monthExpenses.forEach(e => byCat[e.category] = (byCat[e.category]||0) + e.amount);
-  for(const [cat, amt] of Object.entries(byCat)){
-    const div = document.createElement('div');
-    div.style.display='flex'; div.style.justifyContent='space-between'; div.style.padding='6px 0';
-    div.innerHTML = `<div style="text-transform:capitalize">${escapeHtml(cat)}</div><div style="font-weight:700">${fmt(amt)}</div>`;
-    wrap.appendChild(div);
-  }
-  if(Object.keys(byCat).length === 0) wrap.innerHTML = '<div class="small muted">No expenses recorded this month.</div>';
-}
-
-/* ====== Utility: escapeHtml for safety when injecting strings ====== */
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-/* ====== Main render ====== */
-function renderAll(){
-  renderCalendar();
-  renderExpensesList();
-  renderCategorySummary();
-}
-
-/* Load sample data for first-time users (optional) */
-if(state.expenses.length === 0 && Object.keys(state.events).length === 0 && Object.keys(state.budget).length === 0){
-  // leave empty to keep it simple, or uncomment to prefill sample
-  // state.budget[ monthKey(view.year, view.month) ] = 1200;
-  // state.expenses.push({id:uid(), name:'Sample: Textbook', date: dateKey(new Date()), category:'textbooks', amount:75});
-  // saveState();
-}
-
-/* Auto-save on unload */
-window.addEventListener('beforeunload', saveState);
-
-renderAll();
-</script>
+    // Initial load
+    renderCalendar();
+  </script>
 </body>
 </html>
