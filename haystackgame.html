@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find the Needle Game</title>
+<style>
+    body {
+        font-family: sans-serif;
+        text-align: center;
+        background-color: #f5f5dc; /* hay color background */
+        padding: 20px;
+    }
+    h1 {
+        color: #8b4513;
+    }
+    #game {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, 50px);
+        justify-content: center;
+        gap: 5px;
+        margin-top: 20px;
+    }
+    .item {
+        font-size: 40px;
+        cursor: pointer;
+    }
+    #score {
+        margin-top: 20px;
+        font-size: 20px;
+    }
+</style>
+</head>
+<body>
+
+<h1>Find the Needle in the Haystack!</h1>
+<p>Click the 🪡 needle!</p>
+<div id="game"></div>
+<div id="score">Round: 1 | Score: 0</div>
+
+<script>
+let round = 1;
+let score = 0;
+
+function createGame(round) {
+    const gameDiv = document.getElementById('game');
+    gameDiv.innerHTML = '';
+    
+    // Number of hay pieces increases with round
+    const totalItems = 5 + round * 2; 
+    const needleIndex = Math.floor(Math.random() * totalItems);
+
+    for (let i = 0; i < totalItems; i++) {
+        const item = document.createElement('div');
+        item.classList.add('item');
+        if (i === needleIndex) {
+            item.textContent = '🪡';
+            item.addEventListener('click', () => {
+                score += 1;
+                round += 1;
+                updateScore();
+                createGame(round);
+            });
+        } else {
+            item.textContent = '🌾';
+            item.addEventListener('click', () => {
+                alert('Oops! That is just hay! Try again.');
+            });
+        }
+        gameDiv.appendChild(item);
+    }
+}
+
+function updateScore() {
+    document.getElementById('score').textContent = `Round: ${round} | Score: ${score}`;
+}
+
+// Initialize game
+createGame(round);
+</script>
+
+</body>
+</html>
