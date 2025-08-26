@@ -2,239 +2,214 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>College Budget Tracker</title>
+  <title>College Expense Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: "Segoe UI", sans-serif;
+      background: #f5f7fa;
       margin: 0;
       padding: 0;
-      background: linear-gradient(to right, #f0f4f8, #d9e4ec);
       color: #333;
     }
     header {
-      background: #2c3e50;
+      background: #2a5298;
       color: white;
+      padding: 20px;
       text-align: center;
-      padding: 30px 20px;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 3rem;
+      font-size: 2em;
     }
     main {
-      max-width: 1000px;
-      margin: 30px auto;
-      padding: 30px;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      padding: 20px;
+    }
+    section {
       background: white;
-      border-radius: 15px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     }
     h2 {
-      margin-top: 30px;
-      font-size: 1.8rem;
-      color: #2c3e50;
-      border-bottom: 2px solid #ddd;
-      padding-bottom: 10px;
-    }
-    label {
-      font-size: 1.2rem;
-      margin: 10px 0;
-      display: block;
+      margin-top: 0;
+      color: #2a5298;
     }
     input, select, button {
-      padding: 12px;
-      margin-top: 8px;
-      font-size: 1rem;
+      padding: 10px;
+      margin: 5px 0;
       border: 1px solid #ccc;
       border-radius: 8px;
+      font-size: 1em;
+      width: 100%;
     }
     button {
-      background: #3498db;
+      background: #2a5298;
       color: white;
-      border: none;
       cursor: pointer;
-      transition: background 0.3s;
+      font-weight: bold;
     }
     button:hover {
-      background: #2980b9;
+      background: #1e3c72;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      font-size: 1.1rem;
+      margin-top: 15px;
     }
     th, td {
-      border: 1px solid #ccc;
-      padding: 12px;
-      text-align: center;
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
     }
     th {
-      background: #34495e;
-      color: white;
+      background: #f0f0f0;
     }
-    #progressBarContainer {
-      width: 100%;
+    .progress {
       background: #eee;
-      border-radius: 12px;
-      margin: 20px 0;
-      height: 35px;
+      border-radius: 10px;
+      height: 20px;
+      margin: 10px 0;
+      overflow: hidden;
     }
-    #progressBar {
+    .progress-bar {
       height: 100%;
+      background: #2a5298;
       width: 0%;
-      background: green;
-      border-radius: 12px;
-      text-align: center;
-      color: white;
-      line-height: 35px;
-      font-size: 1.2rem;
+      transition: width 0.3s;
     }
-    .Rent { background-color: #ff9999; }
-    .Tuition { background-color: #ffcc99; }
-    .Textbooks { background-color: #ffff99; }
-    .Food { background-color: #ccffcc; }
-    .Transportation { background-color: #99ccff; }
-    .Supplies { background-color: #c299ff; }
-    .Entertainment { background-color: #ffb3e6; }
-    .Other { background-color: #d9d9d9; }
-    footer {
-      text-align: center;
-      padding: 20px;
-      background: #2c3e50;
-      color: white;
-      margin-top: 40px;
+    #calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      margin-top: 10px;
+    }
+    .day {
+      border: 1px solid #ddd;
+      padding: 10px;
+      min-height: 60px;
+      font-size: 0.9em;
+      background: #fafafa;
+    }
+    .due {
+      background: #ffe6e6;
+      border: 2px solid #ff4d4d;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>College Budget Tracker</h1>
-    <p>Track your expenses, stay on budget, and manage your college life smarter</p>
-  </header>
+  <header>📚 College Expense Tracker</header>
+
   <main>
-    <section>
-      <label>Monthly Budget ($):
-        <input type="number" id="budget" placeholder="e.g., 1200">
-      </label>
-      <button onclick="setBudget()">Set Budget</button>
-      <p id="budgetDisplay" style="font-size:1.3rem; margin-top:10px;"></p>
-
-      <div id="progressBarContainer">
-        <div id="progressBar">0%</div>
-      </div>
-    </section>
-
-    <section>
-      <h2>Add Expense</h2>
-      <label>Amount ($):
-        <input type="number" id="amount">
-      </label>
-      <label>Category:
+    <!-- Left Column -->
+    <div>
+      <section>
+        <h2>Add Expense</h2>
         <select id="category">
-          <option>Tuition</option>
-          <option>Textbooks</option>
-          <option>Rent</option>
-          <option>Food</option>
-          <option>Transportation</option>
-          <option>Supplies</option>
-          <option>Entertainment</option>
-          <option>Other</option>
+          <option value="Tuition">🎓 Tuition</option>
+          <option value="Textbooks">📖 Textbooks</option>
+          <option value="Rent">🏠 Rent</option>
+          <option value="Food">🍕 Food</option>
+          <option value="Entertainment">🎬 Entertainment</option>
+          <option value="Other">➕ Other</option>
         </select>
-      </label>
-      <label>Note:
-        <input type="text" id="note">
-      </label>
-      <button onclick="addExpense()">Add Expense</button>
-    </section>
+        <input type="number" id="amount" placeholder="Amount ($)">
+        <button onclick="addExpense()">Add Expense</button>
 
-    <section>
-      <h2>Expenses</h2>
-      <table>
-        <thead>
-          <tr><th>Amount</th><th>Category</th><th>Note</th></tr>
-        </thead>
-        <tbody id="expenseList"></tbody>
-      </table>
-    </section>
+        <h3>Expenses</h3>
+        <table id="expenseTable">
+          <tr><th>Category</th><th>Amount</th></tr>
+        </table>
+      </section>
 
-    <section>
-      <h2>Summary</h2>
-      <p style="font-size:1.4rem;">Total Spent: $<span id="total">0</span></p>
-      <p style="font-size:1.4rem;">Remaining: $<span id="remaining">0</span></p>
-      <button style="background:#e74c3c; margin-top:15px;" onclick="clearAll()">Clear All</button>
-    </section>
+      <section>
+        <h2>Savings Goal</h2>
+        <input type="number" id="goalAmount" placeholder="Enter goal amount ($)">
+        <button onclick="setGoal()">Set Goal</button>
+        <div class="progress"><div class="progress-bar" id="goalBar"></div></div>
+        <p id="goalText">No goal set.</p>
+      </section>
+
+      <section>
+        <h2>Calendar (Due Dates)</h2>
+        <div id="calendar"></div>
+      </section>
+    </div>
+
+    <!-- Right Column -->
+    <div>
+      <section>
+        <h2>Spending Breakdown</h2>
+        <canvas id="pieChart"></canvas>
+      </section>
+    </div>
   </main>
-  <footer>
-    <p>College Budget Tracker © 2025 | Designed for Students</p>
-  </footer>
 
   <script>
-    let budget = 0;
-    let expenses = [];
-
-    // Load saved data
-    window.onload = function() {
-      if(localStorage.getItem('budget')) {
-        budget = parseFloat(localStorage.getItem('budget'));
-        document.getElementById("budgetDisplay").innerText = "Budget set: $" + budget;
-      }
-      if(localStorage.getItem('expenses')) {
-        expenses = JSON.parse(localStorage.getItem('expenses'));
-        updateTable();
-      }
-    }
-
-    function setBudget() {
-      budget = parseFloat(document.getElementById("budget").value) || 0;
-      localStorage.setItem('budget', budget);
-      document.getElementById("budgetDisplay").innerText = "Budget set: $" + budget;
-      updateTable();
-    }
+    let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+    let goal = JSON.parse(localStorage.getItem("goal")) || {amount:0, saved:0};
+    const recurring = [
+      {category:"Rent", amount:800, day:1},
+      {category:"Tuition", amount:2000, day:5}
+    ];
 
     function addExpense() {
-      const amount = parseFloat(document.getElementById("amount").value);
-      const category = document.getElementById("category").value;
-      const note = document.getElementById("note").value;
-
-      if(!amount || amount <= 0) return;
-
-      expenses.push({ amount, category, note });
-      localStorage.setItem('expenses', JSON.stringify(expenses));
-
-      updateTable();
+      let cat = document.getElementById("category").value;
+      let amt = parseFloat(document.getElementById("amount").value);
+      if (!amt) return;
+      expenses.push({category:cat, amount:amt});
+      localStorage.setItem("expenses", JSON.stringify(expenses));
       document.getElementById("amount").value = "";
-      document.getElementById("note").value = "";
+      render();
     }
 
-    function updateTable() {
-      const tbody = document.getElementById("expenseList");
-      tbody.innerHTML = "";
-      let total = 0;
-      expenses.forEach(exp => {
-        total += exp.amount;
-        let row = `<tr class="${exp.category}"><td>$${exp.amount}</td><td>${exp.category}</td><td>${exp.note}</td></tr>`;
-        tbody.innerHTML += row;
+    function setGoal() {
+      let amt = parseFloat(document.getElementById("goalAmount").value);
+      if (!amt) return;
+      goal = {amount:amt, saved:0};
+      localStorage.setItem("goal", JSON.stringify(goal));
+      render();
+    }
+
+    function render() {
+      // Expenses Table
+      let table = document.getElementById("expenseTable");
+      table.innerHTML = "<tr><th>Category</th><th>Amount</th></tr>";
+      expenses.forEach(e => {
+        table.innerHTML += `<tr><td>${e.category}</td><td>$${e.amount}</td></tr>`;
       });
 
-      document.getElementById("total").innerText = total;
-      let remaining = budget - total;
-      document.getElementById("remaining").innerText = remaining;
+      // Goal Progress
+      let saved = expenses.reduce((a,b)=>a+b.amount,0);
+      if (goal.amount>0) {
+        let percent = Math.min((saved/goal.amount)*100,100);
+        document.getElementById("goalBar").style.width = percent+"%";
+        document.getElementById("goalText").innerText = `$${saved} of $${goal.amount}`;
+      }
 
-      let percent = budget > 0 ? Math.min((total / budget) * 100, 100) : 0;
-      const progressBar = document.getElementById("progressBar");
-      progressBar.style.width = percent + "%";
-      progressBar.innerText = Math.round(percent) + "%";
-      progressBar.style.background = percent >= 100 ? "#e74c3c" : "#27ae60";
+      // Pie Chart
+      let cats = {};
+      expenses.forEach(e=>cats[e.category]=(cats[e.category]||0)+e.amount);
+      let ctx = document.getElementById("pieChart").getContext("2d");
+      if (window.pie) window.pie.destroy();
+      window.pie = new Chart(ctx,{
+        type:'pie',
+        data:{
+          labels:Object.keys(cats),
+          datasets:[{data:Object.values(cats),backgroundColor:["#ff6384","#36a2eb","#ffce56","#4caf50","#9966ff","#ff9f40"]}]
+        }
+      });
+
+      // Calendar
+      let cal = document.getElementById("calendar");
+      cal.innerHTML = "";
+      for (let i=1;i<=30;i++){
+        let due = recurring.find(r=>r.day===i);
+        cal.innerHTML += `<div class="day ${due?"due":""}">${i}${due?`<br><b>${due.category}: $${due.amount}</b>`:""}</div>`;
+      }
     }
 
-    function clearAll() {
-      localStorage.clear();
-      budget = 0;
-      expenses = [];
-      document.getElementById("budgetDisplay").innerText = "";
-      updateTable();
-    }
+    render();
   </script>
 </body>
 </html>
