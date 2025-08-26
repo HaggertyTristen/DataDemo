@@ -5,43 +5,60 @@
   <title>College Budget & Calendar</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f9;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
       margin: 0;
       padding: 20px;
       color: #333;
     }
-    h1, h2 {
+    h1 {
       text-align: center;
+      margin-bottom: 20px;
     }
-    .container {
-      max-width: 900px;
+    .dashboard {
+      display: flex;
+      gap: 20px;
+      max-width: 1200px;
       margin: auto;
+    }
+    .left-panel, .right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
     .card {
       background: #fff;
       border: 1px solid #ddd;
       border-radius: 8px;
       padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
-    input, select, button {
+    h2 {
+      margin-top: 0;
+    }
+    input, button {
       padding: 8px;
-      margin: 5px 0;
+      margin: 6px 0;
       border: 1px solid #ccc;
       border-radius: 6px;
       width: 100%;
+      font-size: 14px;
     }
     button {
       background: #2d89ef;
       color: #fff;
       border: none;
       cursor: pointer;
+      transition: 0.2s;
     }
     button:hover {
       background: #1c5fb8;
     }
+    ul {
+      padding-left: 20px;
+    }
+    /* Calendar Styling */
     .calendar {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -51,7 +68,7 @@
       background: #f9f9f9;
       border: 1px solid #ddd;
       border-radius: 6px;
-      min-height: 80px;
+      min-height: 90px;
       padding: 5px;
       font-size: 12px;
       position: relative;
@@ -61,7 +78,7 @@
     }
     .expense-tag {
       display: block;
-      background: #ffdfdf;
+      background: #ffefef;
       color: #a00;
       padding: 2px 4px;
       border-radius: 4px;
@@ -69,42 +86,50 @@
       font-size: 11px;
       word-break: break-word;
     }
-    ul {
-      padding-left: 20px;
+    /* Responsive */
+    @media (max-width: 900px) {
+      .dashboard {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>College Expense & Calendar Tracker</h1>
+  <h1>College Budget & Calendar Tracker</h1>
+  
+  <div class="dashboard">
+    <!-- Left Panel -->
+    <div class="left-panel">
+      <!-- Budget Card -->
+      <div class="card">
+        <h2>Set Monthly Budget</h2>
+        <input type="number" id="budgetInput" placeholder="Enter monthly budget ($)">
+        <button onclick="setBudget()">Save Budget</button>
+        <p id="budgetDisplay"></p>
+      </div>
 
-    <!-- Budget Card -->
-    <div class="card">
-      <h2>Set Monthly Budget</h2>
-      <input type="number" id="budgetInput" placeholder="Enter monthly budget ($)">
-      <button onclick="setBudget()">Save Budget</button>
-      <p id="budgetDisplay"></p>
+      <!-- Expense Form -->
+      <div class="card">
+        <h2>Add Expense</h2>
+        <input type="text" id="expenseName" placeholder="Expense Name (e.g. Rent)">
+        <input type="number" id="expenseAmount" placeholder="Amount ($)">
+        <input type="date" id="expenseDate">
+        <button onclick="addExpense()">Add Expense</button>
+      </div>
+
+      <!-- Expense List -->
+      <div class="card">
+        <h2>Expenses</h2>
+        <ul id="expenseList"></ul>
+      </div>
     </div>
 
-    <!-- Expense Form -->
-    <div class="card">
-      <h2>Add Expense</h2>
-      <input type="text" id="expenseName" placeholder="Expense Name (e.g. Rent)">
-      <input type="number" id="expenseAmount" placeholder="Amount ($)">
-      <input type="date" id="expenseDate">
-      <button onclick="addExpense()">Add Expense</button>
-    </div>
-
-    <!-- Expense List -->
-    <div class="card">
-      <h2>Expenses</h2>
-      <ul id="expenseList"></ul>
-    </div>
-
-    <!-- Calendar -->
-    <div class="card">
-      <h2>Calendar</h2>
-      <div class="calendar" id="calendar"></div>
+    <!-- Right Panel (Calendar) -->
+    <div class="right-panel">
+      <div class="card">
+        <h2>Calendar</h2>
+        <div class="calendar" id="calendar"></div>
+      </div>
     </div>
   </div>
 
@@ -114,7 +139,8 @@
 
     function setBudget() {
       budget = parseFloat(document.getElementById("budgetInput").value) || 0;
-      document.getElementById("budgetDisplay").textContent = "Monthly Budget: $" + budget.toFixed(2);
+      document.getElementById("budgetDisplay").textContent = 
+        "Monthly Budget: $" + budget.toFixed(2);
     }
 
     function addExpense() {
@@ -158,13 +184,13 @@
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-      // Empty days before start
+      // Empty slots before first day
       for (let i = 0; i < firstDay; i++) {
         const empty = document.createElement("div");
         calendar.appendChild(empty);
       }
 
-      // Days
+      // Fill days
       for (let d = 1; d <= daysInMonth; d++) {
         const dayBox = document.createElement("div");
         dayBox.className = "day";
@@ -185,7 +211,7 @@
       }
     }
 
-    // Initial load
+    // Initial
     renderCalendar();
   </script>
 </body>
