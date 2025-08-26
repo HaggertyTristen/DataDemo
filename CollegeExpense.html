@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>College Budget Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    main {
+      max-width: 700px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      border-bottom: 2px solid #eee;
+      padding-bottom: 5px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background: #2c3e50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #34495e;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📚 College Budget Tracker</h1>
+    <p>Track tuition, textbooks, rent, and more!</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Monthly Budget</h2>
+      <label>Set Budget Amount
+        <input type="number" id="budgetInput" placeholder="e.g., 1000" />
+      </label>
+      <button onclick="setBudget()">Set Budget</button>
+      <p id="budgetDisplay">No budget set.</p>
+    </section>
+
+    <section>
+      <h2>Add Expense</h2>
+      <label>Category
+        <select id="expCat">
+          <option>Tuition</option>
+          <option>Textbooks</option>
+          <option>Rent</option>
+          <option>Food</option>
+          <option>Transportation</option>
+          <option>Supplies</option>
+          <option>Entertainment</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <label>Amount
+        <input type="number" id="expAmount" placeholder="e.g., 200" />
+      </label>
+      <button onclick="addExpense()">Add Expense</button>
+    </section>
+
+    <section>
+      <h2>Expenses</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Amount</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="expTable"></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Summary</h2>
+      <p id="summary">No expenses yet.</p>
+    </section>
+  </main>
+
+  <script>
+    let expenses = [];
+    let budget = 0;
+
+    function setBudget(){
+      const val = parseFloat(document.getElementById('budgetInput').value);
+      if(isNaN(val) || val <= 0){
+        alert('Please enter a valid budget');
+        return;
+      }
+      budget = val;
+      document.getElementById('budgetDisplay').textContent = `Monthly Budget: $${budget.toFixed(2)}`;
+      render();
+    }
+
+    function addExpense(){
+      const cat = document.getElementById('expCat').value;
+      const amt = parseFloat(document.getElementById('expAmount').value);
+      if(isNaN(amt) || amt <= 0){
+        alert('Please enter a valid amount');
+        return;
+      }
+      expenses.push({cat, amt});
+      document.getElementById('expAmount').value = '';
+      render();
+    }
+
+    function deleteExpense(i){
+      expenses.splice(i,1);
+      render();
+    }
+
+    function render(){
+      const tbody = document.getElementById('expTable');
+      tbody.innerHTML = '';
+      let total = 0;
+      expenses.forEach((e,i)=>{
+        total += e.amt;
+        tbody.innerHTML += `<tr>
+          <td>${e.cat}</td>
+          <td>$${e.amt.toFixed(2)}</td>
+          <td><button onclick="deleteExpense(${i})">X</button></td>
+        </tr>`;
+      });
+
+      let summary = `Total spent: $${total.toFixed(2)}`;
+      if(budget > 0){
+        let remaining = budget - total;
+        summary += ` | Remaining: $${remaining.toFixed(2)}`;
+        if(remaining < 0){
+          summary += " ⚠️ Over budget!";
+        }
+      }
+      document.getElementById('summary').textContent = summary;
+    }
+  </script>
+</body>
+</html>
