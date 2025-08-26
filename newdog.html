@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dog Running Through Grass</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #87ceeb; /* Sky blue background */
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+
+        .grass {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            font-size: 50px;
+            text-align: center;
+        }
+
+        .dog {
+            position: absolute;
+            bottom: 80px; /* above the grass */
+            font-size: 120px; /* large dog */
+            animation: run 5s linear infinite;
+        }
+
+        @keyframes run {
+            0% { left: -150px; }
+            50% { left: 50%; }
+            100% { left: 110%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dog">🐕💨</div>
+    <div class="grass">🌿🌱🌿🌱🌿🌱🌿🌱🌿🌱</div>
+</body>
+</html>
