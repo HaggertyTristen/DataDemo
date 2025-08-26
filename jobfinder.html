@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Career Path Finder</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #eef2f3;
+    margin: 0;
+    padding: 20px;
+}
+h1 {
+    color: #2a52be;
+    text-align: center;
+}
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+}
+input[type="file"], input[type="text"], button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 16px;
+}
+.job {
+    background-color: #f0f8ff;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+</style>
+</head>
+<body>
+
+<h1>Smart Career Path Finder</h1>
+<div class="container">
+    <label for="resume">Upload your resume (txt only for demo):</label>
+    <input type="file" id="resume" accept=".txt">
+
+    <label for="location">Enter your city:</label>
+    <input type="text" id="location" placeholder="e.g., New York">
+
+    <button onclick="findJobs()">Find Jobs</button>
+
+    <div id="jobs"></div>
+</div>
+
+<script>
+// Example job database with keywords
+const jobsDatabase = [
+    {title: "Data Analyst", location: "New York", keywords: ["data", "excel", "analysis", "python", "sql"]},
+    {title: "Frontend Developer", location: "San Francisco", keywords: ["html", "css", "javascript", "react"]},
+    {title: "UI/UX Designer", location: "Los Angeles", keywords: ["design", "ui", "ux", "photoshop"]},
+    {title: "Marketing Specialist", location: "Chicago", keywords: ["marketing", "sales", "seo", "content"]},
+    {title: "Math Teacher", location: "New York", keywords: ["math", "teaching", "education", "lesson"]},
+];
+
+function findJobs() {
+    const resumeFile = document.getElementById('resume').files[0];
+    const location = document.getElementById('location').value.trim();
+    const jobsDiv = document.getElementById('jobs');
+    jobsDiv.innerHTML = '';
+
+    if (!resumeFile) {
+        alert('Please upload your resume.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result.toLowerCase();
+        const results = jobsDatabase.map(job => {
+            // Count how many keywords match
+            const matches = job.keywords.filter(kw => text.includes(kw));
+            return {...job, matchCount: matches.length};
+        });
+
+        // Filter jobs by location if provided
+        const filtered = results
+            .filter(job => location === "" || job.location.toLowerCase().includes(location.toLowerCase()))
+            .sort((a,b) => b.matchCount - a.matchCount); // sort by most matches
+
+        if(filtered.length === 0) {
+            jobsDiv.innerHTML = "<p>No jobs found matching your resume and location.</p>";
+            return;
+        }
+
+        filtered.forEach(job => {
+            const div = document.createElement('div');
+            div.classList.add('job');
+            div.innerHTML = `<strong>${job.title}</strong> - ${job.location} <br> Matches: ${job.matchCount} keyword(s)`;
+            jobsDiv.appendChild(div);
+        });
+    }
+
+    reader.readAsText(resumeFile);
+}
+</script>
+
+</body>
+</html>
