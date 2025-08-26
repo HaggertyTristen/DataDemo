@@ -4,14 +4,92 @@
   <meta charset="UTF-8">
   <title>College Budget Tracker</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 700px; margin: 20px auto; padding: 10px; }
-    h1 { text-align: center; }
-    label, input, select, button { margin: 5px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background: #f4f4f4; }
-    #progressBarContainer { width: 100%; background: #eee; border-radius: 8px; margin: 10px 0; height: 25px; }
-    #progressBar { height: 100%; width: 0%; background: green; border-radius: 8px; text-align: center; color: white; line-height: 25px; font-size: 14px; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #f0f4f8, #d9e4ec);
+      color: #333;
+    }
+    header {
+      background: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 3rem;
+    }
+    main {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 30px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-top: 30px;
+      font-size: 1.8rem;
+      color: #2c3e50;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+    }
+    label {
+      font-size: 1.2rem;
+      margin: 10px 0;
+      display: block;
+    }
+    input, select, button {
+      padding: 12px;
+      margin-top: 8px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      background: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 1.1rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 12px;
+      text-align: center;
+    }
+    th {
+      background: #34495e;
+      color: white;
+    }
+    #progressBarContainer {
+      width: 100%;
+      background: #eee;
+      border-radius: 12px;
+      margin: 20px 0;
+      height: 35px;
+    }
+    #progressBar {
+      height: 100%;
+      width: 0%;
+      background: green;
+      border-radius: 12px;
+      text-align: center;
+      color: white;
+      line-height: 35px;
+      font-size: 1.2rem;
+    }
     .Rent { background-color: #ff9999; }
     .Tuition { background-color: #ffcc99; }
     .Textbooks { background-color: #ffff99; }
@@ -20,52 +98,82 @@
     .Supplies { background-color: #c299ff; }
     .Entertainment { background-color: #ffb3e6; }
     .Other { background-color: #d9d9d9; }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #2c3e50;
+      color: white;
+      margin-top: 40px;
+    }
   </style>
 </head>
 <body>
-  <h1>College Budget Tracker</h1>
+  <header>
+    <h1>College Budget Tracker</h1>
+    <p>Track your expenses, stay on budget, and manage your college life smarter</p>
+  </header>
+  <main>
+    <section>
+      <label>Monthly Budget ($):
+        <input type="number" id="budget" placeholder="e.g., 1200">
+      </label>
+      <button onclick="setBudget()">Set Budget</button>
+      <p id="budgetDisplay" style="font-size:1.3rem; margin-top:10px;"></p>
 
-  <label>Monthly Budget ($): <input type="number" id="budget" placeholder="e.g., 1000"></label>
-  <button onclick="setBudget()">Set Budget</button>
-  <p id="budgetDisplay"></p>
+      <div id="progressBarContainer">
+        <div id="progressBar">0%</div>
+      </div>
+    </section>
 
-  <div id="progressBarContainer">
-    <div id="progressBar">0%</div>
-  </div>
+    <section>
+      <h2>Add Expense</h2>
+      <label>Amount ($):
+        <input type="number" id="amount">
+      </label>
+      <label>Category:
+        <select id="category">
+          <option>Tuition</option>
+          <option>Textbooks</option>
+          <option>Rent</option>
+          <option>Food</option>
+          <option>Transportation</option>
+          <option>Supplies</option>
+          <option>Entertainment</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <label>Note:
+        <input type="text" id="note">
+      </label>
+      <button onclick="addExpense()">Add Expense</button>
+    </section>
 
-  <h2>Add Expense</h2>
-  <label>Amount ($): <input type="number" id="amount"></label>
-  <label>Category:
-    <select id="category">
-      <option>Tuition</option>
-      <option>Textbooks</option>
-      <option>Rent</option>
-      <option>Food</option>
-      <option>Transportation</option>
-      <option>Supplies</option>
-      <option>Entertainment</option>
-      <option>Other</option>
-    </select>
-  </label>
-  <label>Note: <input type="text" id="note"></label>
-  <button onclick="addExpense()">Add</button>
+    <section>
+      <h2>Expenses</h2>
+      <table>
+        <thead>
+          <tr><th>Amount</th><th>Category</th><th>Note</th></tr>
+        </thead>
+        <tbody id="expenseList"></tbody>
+      </table>
+    </section>
 
-  <h2>Expenses</h2>
-  <table>
-    <thead>
-      <tr><th>Amount</th><th>Category</th><th>Note</th></tr>
-    </thead>
-    <tbody id="expenseList"></tbody>
-  </table>
-
-  <h2>Total Spent: $<span id="total">0</span></h2>
-  <h2>Remaining: $<span id="remaining">0</span></h2>
+    <section>
+      <h2>Summary</h2>
+      <p style="font-size:1.4rem;">Total Spent: $<span id="total">0</span></p>
+      <p style="font-size:1.4rem;">Remaining: $<span id="remaining">0</span></p>
+      <button style="background:#e74c3c; margin-top:15px;" onclick="clearAll()">Clear All</button>
+    </section>
+  </main>
+  <footer>
+    <p>College Budget Tracker © 2025 | Designed for Students</p>
+  </footer>
 
   <script>
     let budget = 0;
     let expenses = [];
 
-    // Load saved data from localStorage
+    // Load saved data
     window.onload = function() {
       if(localStorage.getItem('budget')) {
         budget = parseFloat(localStorage.getItem('budget'));
@@ -113,12 +221,19 @@
       let remaining = budget - total;
       document.getElementById("remaining").innerText = remaining;
 
-      // Update progress bar
       let percent = budget > 0 ? Math.min((total / budget) * 100, 100) : 0;
       const progressBar = document.getElementById("progressBar");
       progressBar.style.width = percent + "%";
       progressBar.innerText = Math.round(percent) + "%";
-      progressBar.style.background = percent >= 100 ? "red" : "green";
+      progressBar.style.background = percent >= 100 ? "#e74c3c" : "#27ae60";
+    }
+
+    function clearAll() {
+      localStorage.clear();
+      budget = 0;
+      expenses = [];
+      document.getElementById("budgetDisplay").innerText = "";
+      updateTable();
     }
   </script>
 </body>
