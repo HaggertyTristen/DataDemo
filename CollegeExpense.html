@@ -3,21 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <title>College Expense Tracker</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
-      font-family: "Segoe UI", sans-serif;
-      background: #f5f7fa;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f9fafc;
       margin: 0;
       padding: 0;
       color: #333;
     }
     header {
-      background: #2a5298;
+      background: #2c3e50;
       color: white;
       padding: 20px;
       text-align: center;
-      font-size: 2em;
+      font-size: 2rem;
+      font-weight: bold;
+      letter-spacing: 1px;
     }
     main {
       display: grid;
@@ -25,60 +26,65 @@
       gap: 20px;
       padding: 20px;
     }
-    section {
+    .card {
       background: white;
-      padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     h2 {
       margin-top: 0;
-      color: #2a5298;
+      font-size: 1.3rem;
+      color: #2c3e50;
     }
-    input, select, button {
+    input, select, button, textarea {
       padding: 10px;
-      margin: 5px 0;
+      margin: 6px 0;
+      border-radius: 6px;
       border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1em;
       width: 100%;
+      font-size: 1rem;
     }
     button {
-      background: #2a5298;
+      background: #3498db;
       color: white;
+      border: none;
       cursor: pointer;
-      font-weight: bold;
+      transition: 0.3s;
     }
     button:hover {
-      background: #1e3c72;
+      background: #2980b9;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
+    ul {
+      list-style: none;
+      padding: 0;
     }
-    th, td {
-      border: 1px solid #ddd;
+    li {
       padding: 10px;
-      text-align: left;
-    }
-    th {
-      background: #f0f0f0;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .progress {
-      background: #eee;
-      border-radius: 10px;
-      height: 20px;
-      margin: 10px 0;
+      height: 25px;
+      background: #ddd;
+      border-radius: 12px;
       overflow: hidden;
+      margin: 10px 0;
     }
     .progress-bar {
       height: 100%;
-      background: #2a5298;
-      width: 0%;
-      transition: width 0.3s;
+      width: 0;
+      background: #27ae60;
+      text-align: center;
+      color: white;
+      line-height: 25px;
+      font-size: 0.9rem;
+      transition: width 0.5s ease;
     }
-    #calendar {
+    /* Calendar */
+    .calendar {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 5px;
@@ -87,129 +93,179 @@
     .day {
       border: 1px solid #ddd;
       padding: 10px;
-      min-height: 60px;
-      font-size: 0.9em;
-      background: #fafafa;
+      min-height: 80px;
+      border-radius: 6px;
+      background: #fdfdfd;
+      position: relative;
+      cursor: pointer;
+      transition: 0.3s;
     }
-    .due {
-      background: #ffe6e6;
-      border: 2px solid #ff4d4d;
+    .day:hover {
+      background: #f0f8ff;
+    }
+    .day strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+    }
+    .note {
+      background: #ffeaa7;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      visibility: hidden;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      width: 400px;
+    }
+    .modal.show {
+      visibility: visible;
     }
   </style>
 </head>
 <body>
-  <header>📚 College Expense Tracker</header>
+  <header>📊 College Expense & Calendar Manager</header>
 
   <main>
-    <!-- Left Column -->
-    <div>
-      <section>
-        <h2>Add Expense</h2>
-        <select id="category">
-          <option value="Tuition">🎓 Tuition</option>
-          <option value="Textbooks">📖 Textbooks</option>
-          <option value="Rent">🏠 Rent</option>
-          <option value="Food">🍕 Food</option>
-          <option value="Entertainment">🎬 Entertainment</option>
-          <option value="Other">➕ Other</option>
+    <!-- Expense Tracker -->
+    <div class="card">
+      <h2>Add Expense</h2>
+      <form id="expenseForm">
+        <input type="text" id="expenseName" placeholder="Expense name (e.g. Rent, Textbook)" required>
+        <input type="number" id="expenseAmount" placeholder="Amount ($)" required>
+        <select id="expenseCategory">
+          <option value="tuition">🎓 Tuition</option>
+          <option value="books">📚 Books</option>
+          <option value="rent">🏠 Rent</option>
+          <option value="food">🍕 Food</option>
+          <option value="entertainment">🎬 Entertainment</option>
         </select>
-        <input type="number" id="amount" placeholder="Amount ($)">
-        <button onclick="addExpense()">Add Expense</button>
+        <button type="submit">Add Expense</button>
+      </form>
 
-        <h3>Expenses</h3>
-        <table id="expenseTable">
-          <tr><th>Category</th><th>Amount</th></tr>
-        </table>
-      </section>
+      <h2>Expenses</h2>
+      <ul id="expenseList"></ul>
 
-      <section>
-        <h2>Savings Goal</h2>
-        <input type="number" id="goalAmount" placeholder="Enter goal amount ($)">
-        <button onclick="setGoal()">Set Goal</button>
-        <div class="progress"><div class="progress-bar" id="goalBar"></div></div>
-        <p id="goalText">No goal set.</p>
-      </section>
-
-      <section>
-        <h2>Calendar (Due Dates)</h2>
-        <div id="calendar"></div>
-      </section>
+      <h2>Budget Progress</h2>
+      <div class="progress">
+        <div id="progressBar" class="progress-bar">0%</div>
+      </div>
     </div>
 
-    <!-- Right Column -->
-    <div>
-      <section>
-        <h2>Spending Breakdown</h2>
-        <canvas id="pieChart"></canvas>
-      </section>
+    <!-- Calendar -->
+    <div class="card">
+      <h2>📅 Calendar & Notes</h2>
+      <div class="calendar" id="calendar"></div>
     </div>
   </main>
 
+  <!-- Modal for notes -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <h3>Add Note</h3>
+      <textarea id="noteText" placeholder="Add due date or note..."></textarea>
+      <button id="saveNote">Save</button>
+      <button id="closeModal" style="background:#e74c3c">Cancel</button>
+    </div>
+  </div>
+
   <script>
+    // ====== Expense Tracker ======
+    const expenseForm = document.getElementById("expenseForm");
+    const expenseList = document.getElementById("expenseList");
+    const progressBar = document.getElementById("progressBar");
     let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
-    let goal = JSON.parse(localStorage.getItem("goal")) || {amount:0, saved:0};
-    const recurring = [
-      {category:"Rent", amount:800, day:1},
-      {category:"Tuition", amount:2000, day:5}
-    ];
+    const budgetCap = 2000;
 
-    function addExpense() {
-      let cat = document.getElementById("category").value;
-      let amt = parseFloat(document.getElementById("amount").value);
-      if (!amt) return;
-      expenses.push({category:cat, amount:amt});
+    function updateExpenses() {
+      expenseList.innerHTML = "";
+      let total = 0;
+      expenses.forEach((exp, i) => {
+        total += exp.amount;
+        const li = document.createElement("li");
+        li.innerHTML = \`\${exp.name} - \$\${exp.amount} <span>\${exp.category}</span>\`;
+        expenseList.appendChild(li);
+      });
+
+      let percent = Math.min((total / budgetCap) * 100, 100);
+      progressBar.style.width = percent + "%";
+      progressBar.textContent = Math.round(percent) + "%";
+      progressBar.style.background = total > budgetCap ? "#e74c3c" : "#27ae60";
+
       localStorage.setItem("expenses", JSON.stringify(expenses));
-      document.getElementById("amount").value = "";
-      render();
     }
 
-    function setGoal() {
-      let amt = parseFloat(document.getElementById("goalAmount").value);
-      if (!amt) return;
-      goal = {amount:amt, saved:0};
-      localStorage.setItem("goal", JSON.stringify(goal));
-      render();
-    }
+    expenseForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const name = document.getElementById("expenseName").value;
+      const amount = parseFloat(document.getElementById("expenseAmount").value);
+      const category = document.getElementById("expenseCategory").value;
+      expenses.push({ name, amount, category });
+      updateExpenses();
+      expenseForm.reset();
+    });
 
-    function render() {
-      // Expenses Table
-      let table = document.getElementById("expenseTable");
-      table.innerHTML = "<tr><th>Category</th><th>Amount</th></tr>";
-      expenses.forEach(e => {
-        table.innerHTML += `<tr><td>${e.category}</td><td>$${e.amount}</td></tr>`;
-      });
+    updateExpenses();
 
-      // Goal Progress
-      let saved = expenses.reduce((a,b)=>a+b.amount,0);
-      if (goal.amount>0) {
-        let percent = Math.min((saved/goal.amount)*100,100);
-        document.getElementById("goalBar").style.width = percent+"%";
-        document.getElementById("goalText").innerText = `$${saved} of $${goal.amount}`;
-      }
+    // ====== Calendar with Notes ======
+    const calendar = document.getElementById("calendar");
+    const modal = document.getElementById("modal");
+    const noteText = document.getElementById("noteText");
+    const saveNote = document.getElementById("saveNote");
+    const closeModal = document.getElementById("closeModal");
+    let selectedDay = null;
+    let notes = JSON.parse(localStorage.getItem("notes")) || {};
 
-      // Pie Chart
-      let cats = {};
-      expenses.forEach(e=>cats[e.category]=(cats[e.category]||0)+e.amount);
-      let ctx = document.getElementById("pieChart").getContext("2d");
-      if (window.pie) window.pie.destroy();
-      window.pie = new Chart(ctx,{
-        type:'pie',
-        data:{
-          labels:Object.keys(cats),
-          datasets:[{data:Object.values(cats),backgroundColor:["#ff6384","#36a2eb","#ffce56","#4caf50","#9966ff","#ff9f40"]}]
+    function generateCalendar() {
+      calendar.innerHTML = "";
+      for (let i = 1; i <= 30; i++) {
+        const day = document.createElement("div");
+        day.classList.add("day");
+        day.innerHTML = \`<strong>\${i}</strong>\`;
+        if (notes[i]) {
+          notes[i].forEach(n => {
+            const note = document.createElement("div");
+            note.classList.add("note");
+            note.textContent = n;
+            day.appendChild(note);
+          });
         }
-      });
-
-      // Calendar
-      let cal = document.getElementById("calendar");
-      cal.innerHTML = "";
-      for (let i=1;i<=30;i++){
-        let due = recurring.find(r=>r.day===i);
-        cal.innerHTML += `<div class="day ${due?"due":""}">${i}${due?`<br><b>${due.category}: $${due.amount}</b>`:""}</div>`;
+        day.addEventListener("click", () => {
+          selectedDay = i;
+          noteText.value = "";
+          modal.classList.add("show");
+        });
+        calendar.appendChild(day);
       }
     }
 
-    render();
+    saveNote.addEventListener("click", () => {
+      const text = noteText.value.trim();
+      if (!notes[selectedDay]) notes[selectedDay] = [];
+      if (text) notes[selectedDay].push(text);
+      localStorage.setItem("notes", JSON.stringify(notes));
+      modal.classList.remove("show");
+      generateCalendar();
+    });
+
+    closeModal.addEventListener("click", () => {
+      modal.classList.remove("show");
+    });
+
+    generateCalendar();
   </script>
 </body>
 </html>
