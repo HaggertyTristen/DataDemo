@@ -1,271 +1,427 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>College Expense Tracker</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Construction / College Project Manager — Expenses & Calendar</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: #f9fafc;
-      margin: 0;
-      padding: 0;
-      color: #333;
+    :root{
+      --bg:#0f1724;            /* deep navy */
+      --panel:#0b1220;         /* darker */
+      --card:#0f1728;          /* card bg */
+      --muted:#9aa7b6;
+      --accent:#f59e0b;        /* amber */
+      --accent-2:#06b6d4;      /* teal */
+      --success:#22c55e;
+      --danger:#ef4444;
+      --glass: rgba(255,255,255,0.03);
+      --radius:14px;
+      --page-pad:28px;
+      color-scheme: dark;
     }
-    header {
-      background: #2c3e50;
-      color: white;
-      padding: 20px;
-      text-align: center;
-      font-size: 2rem;
-      font-weight: bold;
-      letter-spacing: 1px;
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    body{background:linear-gradient(180deg,#081021 0%, #0a1120 55%), #081021;color:#e6eef6}
+
+    /* Layout */
+    .app{
+      max-width:1200px;margin:24px auto;padding:20px;display:grid;grid-template-columns:300px 1fr;gap:20px;
     }
-    main {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 20px;
-      padding: 20px;
-    }
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    h2 {
-      margin-top: 0;
-      font-size: 1.3rem;
-      color: #2c3e50;
-    }
-    input, select, button, textarea {
-      padding: 10px;
-      margin: 6px 0;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      width: 100%;
-      font-size: 1rem;
-    }
-    button {
-      background: #3498db;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      background: #2980b9;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
-      padding: 10px;
-      border-bottom: 1px solid #eee;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .progress {
-      height: 25px;
-      background: #ddd;
-      border-radius: 12px;
-      overflow: hidden;
-      margin: 10px 0;
-    }
-    .progress-bar {
-      height: 100%;
-      width: 0;
-      background: #27ae60;
-      text-align: center;
-      color: white;
-      line-height: 25px;
-      font-size: 0.9rem;
-      transition: width 0.5s ease;
-    }
+
+    /* SIDEBAR */
+    .sidebar{background:var(--panel);border-radius:var(--radius);padding:18px;border:1px solid rgba(255,255,255,0.03);min-height:80vh}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#071022}
+    h1{font-size:18px;margin:0}
+    .muted{color:var(--muted);font-size:13px}
+    .nav{margin-top:20px}
+    .nav button{display:block;width:100%;background:transparent;border:none;color:var(--muted);text-align:left;padding:10px 8px;border-radius:10px;cursor:pointer;font-weight:600}
+    .nav button.active, .nav button:hover{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));color:var(--accent)}
+
+    /* MAIN */
+    .main{display:block}
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+    .topbar .title{font-size:20px;font-weight:700}
+    .controls{display:flex;gap:10px;align-items:center}
+    .controls input, .controls select{background:var(--glass);border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:8px;border-radius:8px}
+    .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:#04101a;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+
+    /* DASH GRID */
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:18px}
+
+    /* Cards */
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .card h2{margin:0 0 12px 0;font-size:16px}
+
+    /* EXPENSES */
+    .expense-form{display:grid;grid-template-columns:1fr 120px 120px 80px;gap:8px}
+    .expense-form input, .expense-form select{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:10px;border-radius:8px;color:var(--muted)}
+    .table{margin-top:12px;border-radius:8px;overflow:hidden}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;font-size:14px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left}
+    th{color:var(--muted);font-size:12px}
+    td.amount{text-align:right;font-weight:700}
+
+    /* SMALL KPIs */
+    .kpis{display:flex;gap:10px}
+    .kpi{flex:1;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));padding:12px;border-radius:10px;text-align:center}
+    .kpi .num{font-size:18px;font-weight:800}
+    .kpi .lbl{color:var(--muted);font-size:12px}
+
     /* Calendar */
-    .calendar {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 5px;
-      margin-top: 10px;
-    }
-    .day {
-      border: 1px solid #ddd;
-      padding: 10px;
-      min-height: 80px;
-      border-radius: 6px;
-      background: #fdfdfd;
-      position: relative;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .day:hover {
-      background: #f0f8ff;
-    }
-    .day strong {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 0.9rem;
-    }
-    .note {
-      background: #ffeaa7;
-      padding: 3px 6px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      margin-top: 4px;
-    }
-    .modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      visibility: hidden;
-    }
-    .modal-content {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      width: 400px;
-    }
-    .modal.show {
-      visibility: visible;
-    }
+    .calendarWrap{display:flex;flex-direction:column;gap:12px}
+    .calHeader{display:flex;justify-content:space-between;align-items:center}
+    .calGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    .day{min-height:100px;padding:10px;border-radius:10px;background:linear-gradient(180deg,#07121b,transparent);border:1px solid rgba(255,255,255,0.02);position:relative}
+    .day .date{position:absolute;top:8px;right:10px;color:var(--muted);font-size:13px}
+    .event{display:block;margin-top:30px;padding:6px 8px;border-radius:8px;color:#061217;font-weight:700;font-size:13px}
+    .ev-tuition{background:#ffd7a8}
+    .ev-rent{background:#ffb4b4}
+    .ev-text{background:#d3f8e2}
+    .ev-food{background:#c7e2ff}
+    .ev-other{background:#e7d7ff}
+
+    /* Modal */
+    .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(rgba(2,6,23,0.6),rgba(2,6,23,0.6));visibility:hidden;opacity:0;transition:opacity .2s}
+    .modal.show{visibility:visible;opacity:1}
+    .modalCard{width:480px;background:#07121a;padding:20px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .modalCard h3{margin:0 0 10px}
+    .form-row{display:flex;gap:8px}
+    .form-row .col{flex:1}
+    .small{font-size:13px;color:var(--muted)}
+
+    /* responsive */
+    @media (max-width:1000px){.app{grid-template-columns:1fr;}.grid{grid-template-columns:1fr}} 
   </style>
 </head>
 <body>
-  <header>📊 College Expense & Calendar Manager</header>
-
-  <main>
-    <!-- Expense Tracker -->
-    <div class="card">
-      <h2>Add Expense</h2>
-      <form id="expenseForm">
-        <input type="text" id="expenseName" placeholder="Expense name (e.g. Rent, Textbook)" required>
-        <input type="number" id="expenseAmount" placeholder="Amount ($)" required>
-        <select id="expenseCategory">
-          <option value="tuition">🎓 Tuition</option>
-          <option value="books">📚 Books</option>
-          <option value="rent">🏠 Rent</option>
-          <option value="food">🍕 Food</option>
-          <option value="entertainment">🎬 Entertainment</option>
-        </select>
-        <button type="submit">Add Expense</button>
-      </form>
-
-      <h2>Expenses</h2>
-      <ul id="expenseList"></ul>
-
-      <h2>Budget Progress</h2>
-      <div class="progress">
-        <div id="progressBar" class="progress-bar">0%</div>
+  <div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand"><div class="logo">PM</div><div><h1>ProjManage</h1><div class="muted">Expenses • Calendar • Reports</div></div></div>
+      <div class="nav" role="navigation">
+        <button class="active" data-tab="dashboard">Dashboard</button>
+        <button data-tab="expenses">Expenses</button>
+        <button data-tab="calendar">Calendar</button>
+        <button data-tab="reports">Reports</button>
+        <button data-tab="settings">Settings</button>
       </div>
-    </div>
+      <div style="margin-top:20px" class="small muted">Auto-saved locally • Works offline</div>
+      <div style="margin-top:14px"><button class="btn" id="exportBtn">Export Data</button></div>
+    </aside>
 
-    <!-- Calendar -->
-    <div class="card">
-      <h2>📅 Calendar & Notes</h2>
-      <div class="calendar" id="calendar"></div>
-    </div>
-  </main>
+    <!-- MAIN -->
+    <main class="main">
+      <div class="topbar">
+        <div class="title">Dashboard</div>
+        <div class="controls">
+          <input id="monthPicker" type="month">
+          <button class="btn ghost" id="newEventBtn">+ New Event</button>
+        </div>
+      </div>
 
-  <!-- Modal for notes -->
+      <div class="grid">
+        <!-- LEFT COLUMN: main cards -->
+        <div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <h2>Overview</h2>
+              <div class="small muted">Month: <span id="viewMonth">—</span></div>
+            </div>
+            <div class="kpis" style="margin-top:12px">
+              <div class="kpi"><div class="num" id="kTotal">$0</div><div class="lbl">Total Spent</div></div>
+              <div class="kpi"><div class="num" id="kBudget">$0</div><div class="lbl">Budget</div></div>
+              <div class="kpi"><div class="num" id="kRemaining">$0</div><div class="lbl">Remaining</div></div>
+            </div>
+            <div style="margin-top:14px">
+              <div class="small">Budget</div>
+              <div class="progress" style="height:16px;border-radius:10px;background:rgba(255,255,255,0.03);overflow:hidden">
+                <div id="budgetBar" style="height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));text-align:right;padding-right:8px;color:#04101a;font-weight:800;line-height:16px">0%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <h2>Quick Add Expense</h2>
+            <div class="expense-form">
+              <input id="txtName" placeholder="Description (Rent, Books...)">
+              <input id="txtAmount" type="number" placeholder="Amount">
+              <select id="txtCategory">
+                <option value="tuition">Tuition</option>
+                <option value="rent">Rent</option>
+                <option value="textbooks">Textbooks</option>
+                <option value="food">Food</option>
+                <option value="transport">Transport</option>
+                <option value="other">Other</option>
+              </select>
+              <button id="addExpenseBtn" class="btn">Add</button>
+            </div>
+
+            <div class="table">
+              <table>
+                <thead><tr><th>Item</th><th>Category</th><th>Amount</th></tr></thead>
+                <tbody id="expensesTbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <h2>Monthly Calendar</h2>
+            <div class="calendarWrap">
+              <div class="calHeader">
+                <div class="small muted">Click a day to Add / Edit events</div>
+                <div>
+                  <button class="btn ghost" id="prevMonth">◀</button>
+                  <button class="btn ghost" id="nextMonth">▶</button>
+                </div>
+              </div>
+              <div id="calendarGrid" class="calGrid"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: charts & settings -->
+        <aside>
+          <div class="card">
+            <h2>Spending Breakdown</h2>
+            <canvas id="spendChart" height="220"></canvas>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <h2>Recurring Items</h2>
+            <div id="recurringList" class="small muted">No recurring items.</div>
+            <div style="margin-top:10px">
+              <input id="recName" placeholder="Name (e.g., Rent)" />
+              <input id="recAmount" type="number" placeholder="Amount" />
+              <input id="recDay" type="number" min="1" max="28" placeholder="Day of month" />
+              <button id="addRecBtn" class="btn">Add Recurring</button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <h2>Settings & Export</h2>
+            <div class="small muted">Save / Load your data</div>
+            <div style="margin-top:8px">
+              <button id="exportData" class="btn ghost">Export JSON</button>
+              <input type="file" id="importFile" style="display:none" accept="application/json" />
+              <button id="importBtn" class="btn ghost">Import JSON</button>
+              <button id="resetBtn" class="btn" style="margin-top:10px;background:#ef4444">Clear All</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- EVENT MODAL -->
   <div id="modal" class="modal">
-    <div class="modal-content">
-      <h3>Add Note</h3>
-      <textarea id="noteText" placeholder="Add due date or note..."></textarea>
-      <button id="saveNote">Save</button>
-      <button id="closeModal" style="background:#e74c3c">Cancel</button>
+    <div class="modalCard">
+      <h3 id="modalTitle">Add / Edit Event</h3>
+      <div style="margin-top:10px">
+        <div class="small">Date</div>
+        <input id="eventDate" type="date" />
+      </div>
+      <div style="margin-top:10px">
+        <div class="small">Title</div>
+        <input id="eventTitle" placeholder="e.g., Pay Rent" />
+      </div>
+      <div style="margin-top:10px">
+        <div class="small">Category</div>
+        <select id="eventCategory">
+          <option value="rent">Rent</option>
+          <option value="tuition">Tuition</option>
+          <option value="textbooks">Textbooks</option>
+          <option value="food">Food</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div style="margin-top:10px">
+        <div class="small">Amount (optional)</div>
+        <input id="eventAmount" type="number" placeholder="e.g., 800" />
+      </div>
+      <div style="margin-top:10px">
+        <div class="small">Notes</div>
+        <textarea id="eventNotes" rows="3" style="width:100%;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px;color:var(--muted)"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button id="deleteEvent" class="btn" style="background:#ef4444">Delete</button>
+        <button id="saveEvent" class="btn">Save</button>
+        <button id="closeModalBtn" class="btn ghost">Cancel</button>
+      </div>
     </div>
   </div>
 
   <script>
-    // ====== Expense Tracker ======
-    const expenseForm = document.getElementById("expenseForm");
-    const expenseList = document.getElementById("expenseList");
-    const progressBar = document.getElementById("progressBar");
-    let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
-    const budgetCap = 2000;
+    // ====== App State ======
+    const stateKey = 'pm_state_v1';
+    let state = loadState();
+    let today = new Date();
+    let viewYear = today.getFullYear();
+    let viewMonth = today.getMonth(); // 0-index
 
-    function updateExpenses() {
-      expenseList.innerHTML = "";
-      let total = 0;
-      expenses.forEach((exp, i) => {
-        total += exp.amount;
-        const li = document.createElement("li");
-        li.innerHTML = \`\${exp.name} - \$\${exp.amount} <span>\${exp.category}</span>\`;
-        expenseList.appendChild(li);
-      });
-
-      let percent = Math.min((total / budgetCap) * 100, 100);
-      progressBar.style.width = percent + "%";
-      progressBar.textContent = Math.round(percent) + "%";
-      progressBar.style.background = total > budgetCap ? "#e74c3c" : "#27ae60";
-
-      localStorage.setItem("expenses", JSON.stringify(expenses));
+    function loadState(){
+      const raw = localStorage.getItem(stateKey);
+      if(raw) return JSON.parse(raw);
+      return { budget:2000, expenses:[], events:{}, recurring:[] };
     }
+    function saveState(){ localStorage.setItem(stateKey, JSON.stringify(state)); }
 
-    expenseForm.addEventListener("submit", e => {
-      e.preventDefault();
-      const name = document.getElementById("expenseName").value;
-      const amount = parseFloat(document.getElementById("expenseAmount").value);
-      const category = document.getElementById("expenseCategory").value;
-      expenses.push({ name, amount, category });
-      updateExpenses();
-      expenseForm.reset();
+    // ====== Utilities ======
+    const fmt = n => n.toLocaleString(undefined,{style:'currency',currency:'USD'});
+    function ymd(date){ const d = new Date(date); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}` }
+
+    // ====== UI Helpers ======
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => document.querySelectorAll(sel);
+
+    // Month picker
+    const monthPicker = $('#monthPicker');
+    monthPicker.value = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}`;
+    monthPicker.addEventListener('change', ()=>{
+      const [y,m] = monthPicker.value.split('-').map(Number); viewYear=y; viewMonth=m-1; renderAll();
     });
 
-    updateExpenses();
+    // Prev/Next
+    $('#prevMonth').onclick = ()=>{ viewMonth--; if(viewMonth<0){viewMonth=11;viewYear--} monthPicker.value=`${viewYear}-${String(viewMonth+1).padStart(2,'0')}`; renderAll(); }
+    $('#nextMonth').onclick = ()=>{ viewMonth++; if(viewMonth>11){viewMonth=0;viewYear++} monthPicker.value=`${viewYear}-${String(viewMonth+1).padStart(2,'0')}`; renderAll(); }
 
-    // ====== Calendar with Notes ======
-    const calendar = document.getElementById("calendar");
-    const modal = document.getElementById("modal");
-    const noteText = document.getElementById("noteText");
-    const saveNote = document.getElementById("saveNote");
-    const closeModal = document.getElementById("closeModal");
-    let selectedDay = null;
-    let notes = JSON.parse(localStorage.getItem("notes")) || {};
+    // Nav tabs
+    $$('.nav button').forEach(b=>b.addEventListener('click', e=>{ $$('.nav button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); const t=b.dataset.tab; /* could implement tab switching */ }));
 
-    function generateCalendar() {
-      calendar.innerHTML = "";
-      for (let i = 1; i <= 30; i++) {
-        const day = document.createElement("div");
-        day.classList.add("day");
-        day.innerHTML = \`<strong>\${i}</strong>\`;
-        if (notes[i]) {
-          notes[i].forEach(n => {
-            const note = document.createElement("div");
-            note.classList.add("note");
-            note.textContent = n;
-            day.appendChild(note);
-          });
-        }
-        day.addEventListener("click", () => {
-          selectedDay = i;
-          noteText.value = "";
-          modal.classList.add("show");
+    // ====== Expenses ======
+    function addExpenseFromForm(){
+      const name = $('#txtName').value.trim();
+      const amt = parseFloat($('#txtAmount').value);
+      const cat = $('#txtCategory').value;
+      if(!name || !amt) return alert('Enter name and amount');
+      state.expenses.push({id:crypto.randomUUID(), name, amount:amt, category:cat, date: new Date().toISOString()});
+      saveState(); clearExpenseForm(); renderAll();
+    }
+    $('#addExpenseBtn').addEventListener('click', addExpenseFromForm);
+    function clearExpenseForm(){ $('#txtName').value=''; $('#txtAmount').value=''; }
+
+    function renderExpensesTable(){
+      const tbody = $('#expensesTbody'); tbody.innerHTML='';
+      const monthKey = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}`;
+      const monthExpenses = state.expenses.filter(e=> e.date.startsWith(monthKey));
+      monthExpenses.forEach(e=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${e.name}</td><td>${e.category}</td><td class="amount">${fmt(e.amount)}</td>`;
+        tbody.appendChild(tr);
+      });
+      // totals
+      const total = monthExpenses.reduce((s,x)=>s+x.amount,0);
+      $('#kTotal').textContent = fmt(total);
+      $('#kBudget').textContent = fmt(state.budget);
+      $('#kRemaining').textContent = fmt(Math.max(0, state.budget-total));
+      const pct = state.budget ? Math.min(100, Math.round((total/state.budget)*100)) : 0;
+      $('#budgetBar').style.width = pct + '%'; $('#budgetBar').textContent = pct + '%';
+      if(pct>=100) $('#budgetBar').style.background = 'var(--danger)'; else $('#budgetBar').style.background = 'linear-gradient(90deg,var(--accent),var(--accent-2))';
+    }
+
+    // ====== Recurring ======
+    $('#addRecBtn').addEventListener('click', ()=>{
+      const name = $('#recName').value.trim(); const amt = parseFloat($('#recAmount').value); const day = parseInt($('#recDay').value);
+      if(!name||!amt||!day) return alert('Enter recurring name, amount, and day (1-28)');
+      state.recurring.push({id:crypto.randomUUID(), name, amount:amt, day}); saveState(); renderRecurring(); $('#recName').value=''; $('#recAmount').value=''; $('#recDay').value=''; renderAll();
+    });
+    function renderRecurring(){
+      const wrap = $('#recurringList'); if(!state.recurring.length){ wrap.textContent='No recurring items.'; return; }
+      wrap.innerHTML=''; state.recurring.forEach(r=>{ const div = document.createElement('div'); div.style.padding='8px 0'; div.innerHTML = `<strong>${r.name}</strong> • ${fmt(r.amount)} • day ${r.day} <button style="float:right" data-id="${r.id}" class="btn ghost">Delete</button>`; wrap.appendChild(div);} );
+      wrap.querySelectorAll('button').forEach(b=>b.addEventListener('click', e=>{ const id=b.dataset.id; state.recurring = state.recurring.filter(r=>r.id!==id); saveState(); renderRecurring(); renderAll(); }));
+    }
+
+    // ====== Calendar & Events ======
+    function getMonthKey(y,m){ return `${y}-${String(m+1).padStart(2,'0')}` }
+    function eventsForDate(yyyy_mm_dd){ return state.events[yyyy_mm_dd] || [] }
+
+    function renderCalendar(){
+      const grid = $('#calendarGrid'); grid.innerHTML='';
+      const first = new Date(viewYear, viewMonth, 1);
+      const startDay = first.getDay();
+      const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
+      // blank leading
+      for(let i=0;i<startDay;i++){ const blank = document.createElement('div'); blank.className='day'; grid.appendChild(blank); }
+      // days
+      for(let d=1; d<=daysInMonth; d++){
+        const dateStr = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const day = document.createElement('div'); day.className='day';
+        day.innerHTML = `<div class="date">${d}</div>`;
+        // recurring events for this day
+        state.recurring.forEach(r=>{ if(r.day===d){ const ev = document.createElement('span'); ev.className='event ev-rent'; ev.textContent = r.name + ' • ' + fmt(r.amount); day.appendChild(ev); }});
+        // custom events
+        const evs = eventsForDate(dateStr);
+        evs.forEach((ev,i)=>{
+          const evEl = document.createElement('span'); evEl.className='event ' + categoryClass(ev.category); evEl.textContent = ev.title + (ev.amount?(' • '+fmt(ev.amount)):''); evEl.title = ev.notes || '';
+          evEl.addEventListener('click', (e)=>{ e.stopPropagation(); openModal(dateStr, i); });
+          day.appendChild(evEl);
         });
-        calendar.appendChild(day);
+        day.addEventListener('click', ()=> openModal(dateStr));
+        grid.appendChild(day);
       }
     }
 
-    saveNote.addEventListener("click", () => {
-      const text = noteText.value.trim();
-      if (!notes[selectedDay]) notes[selectedDay] = [];
-      if (text) notes[selectedDay].push(text);
-      localStorage.setItem("notes", JSON.stringify(notes));
-      modal.classList.remove("show");
-      generateCalendar();
+    function categoryClass(cat){ switch(cat){ case 'tuition': return 'ev-tuition'; case 'rent': return 'ev-rent'; case 'textbooks': return 'ev-text'; case 'food': return 'ev-food'; default: return 'ev-other'; } }
+
+    // ====== Modal (add/edit event) ======
+    const modal = $('#modal'); const evDate = $('#eventDate'); const evTitle = $('#eventTitle'); const evCat = $('#eventCategory'); const evAmt = $('#eventAmount'); const evNotes = $('#eventNotes'); let modalState = {date:null,index:null};
+
+    function openModal(dateStr, index=null){ modalState.date=dateStr; modalState.index = index; modal.classList.add('show'); evDate.value = dateStr; if(index!==null){ const ev = state.events[dateStr][index]; evTitle.value = ev.title; evCat.value = ev.category; evAmt.value = ev.amount||''; evNotes.value = ev.notes||''; $('#deleteEvent').style.display='inline-block'; } else { evTitle.value=''; evCat.value='rent'; evAmt.value=''; evNotes.value=''; $('#deleteEvent').style.display='none'; } }
+    $('#closeModalBtn').addEventListener('click', ()=>{ modal.classList.remove('show'); });
+
+    $('#saveEvent').addEventListener('click', ()=>{
+      const date = evDate.value; const title = evTitle.value.trim(); const category = evCat.value; const amount = parseFloat(evAmt.value) || 0; const notes = evNotes.value.trim();
+      if(!title) return alert('Please add a title');
+      if(!state.events[date]) state.events[date]=[];
+      if(modalState.index===null){ state.events[date].push({id:crypto.randomUUID(), title, category, amount, notes});
+      } else { state.events[date][modalState.index] = Object.assign({}, state.events[date][modalState.index], {title, category, amount, notes}); }
+      saveState(); modal.classList.remove('show'); renderAll();
     });
 
-    closeModal.addEventListener("click", () => {
-      modal.classList.remove("show");
+    $('#deleteEvent').addEventListener('click', ()=>{
+      if(modalState.index===null) return; const date = evDate.value; state.events[date].splice(modalState.index,1); if(state.events[date].length===0) delete state.events[date]; saveState(); modal.classList.remove('show'); renderAll();
     });
 
-    generateCalendar();
+    // New Event button
+    $('#newEventBtn').addEventListener('click', ()=>{ const next = new Date(viewYear, viewMonth, 1); openModal(ymd(next)); });
+
+    // ====== Chart ======
+    let chart=null;
+    function renderChart(){ const ctx = document.getElementById('spendChart').getContext('2d'); const monthKey = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}`; const monthExpenses = state.expenses.filter(e=> e.date.startsWith(monthKey)); const byCat = {}; monthExpenses.forEach(e=> byCat[e.category] = (byCat[e.category]||0) + e.amount); const labels = Object.keys(byCat); const data = Object.values(byCat); if(chart) chart.destroy(); chart = new Chart(ctx,{type:'pie',data:{labels, datasets:[{data, backgroundColor:['#ffd7a8','#ffb4b4','#d3f8e2','#c7e2ff','#e7d7ff']}]}, options:{plugins:{legend:{position:'bottom'}}}}); }
+
+    // ====== Import/Export ======
+    $('#exportBtn').addEventListener('click', ()=>{ const blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='pm-data.json'; a.click(); URL.revokeObjectURL(url); });
+    $('#importBtn').addEventListener('click', ()=>$('#importFile').click());
+    $('#importFile').addEventListener('change', async e=>{ const file = e.target.files[0]; if(!file) return; const txt = await file.text(); try{ state = JSON.parse(txt); saveState(); renderAll(); alert('Imported'); }catch(err){ alert('Import failed'); } e.target.value=''; });
+
+    // Reset all
+    $('#resetBtn').addEventListener('click', ()=>{ if(confirm('Clear all saved data?')){ state={budget:2000,expenses:[],events:{},recurring:[]}; saveState(); renderAll(); } });
+
+    // Month change helper
+    function ymd(d){ const D=new Date(d); return `${D.getFullYear()}-${String(D.getMonth()+1).padStart(2,'0')}-${String(D.getDate()).padStart(2,'0')}` }
+
+    // ====== Render All ======
+    function renderAll(){ $('#viewMonth').textContent = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}`; renderExpensesTable(); renderCalendar(); renderRecurring(); renderChart(); }
+
+    // initial recurring auto-add to events/expenses for month view
+    function applyRecurringToMonth(){ // ensure recurring items appear as events each month in calendar (visual only)
+      // We don't auto-add as expenses unless user adds; recurring appear on calendar by rendering logic
+    }
+
+    // Startup
+    renderAll();
+
+    // keyboard: esc to close modal
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') modal.classList.remove('show'); });
+
+    // Add expense when saving an event with amount - optional behavior: if amount>0, ask user to add to expenses
+    // For simplicity include a checkbox? omitted here but could be added.
+
   </script>
 </body>
 </html>
