@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f3f6fa;
+      color: #333;
+    }
+
+    header {
+      background: #1e88e5;
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .dashboard {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .current-weather {
+      flex: 1;
+      max-width: 350px;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .current-weather h2 {
+      margin-bottom: 10px;
+      font-size: 1.4rem;
+    }
+
+    .temp {
+      font-size: 3rem;
+      font-weight: bold;
+      margin: 10px 0;
+      color: #1e88e5;
+    }
+
+    .forecast {
+      flex: 2;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 15px;
+    }
+
+    .day {
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .day h3 {
+      font-size: 1rem;
+      margin-bottom: 5px;
+      color: #1e88e5;
+    }
+
+    .day .temp {
+      font-size: 1.2rem;
+      color: #333;
+    }
+
+    .icon {
+      font-size: 2rem;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>🌤 Weather Dashboard</header>
+
+  <div class="dashboard">
+    <!-- Current Weather -->
+    <div class="current-weather">
+      <h2>Orlando, FL</h2>
+      <div class="icon">☀️</div>
+      <div class="temp">84°F</div>
+      <p>Sunny</p>
+      <p>Humidity: 45% | Wind: 6 mph</p>
+    </div>
+
+    <!-- 5 Day Forecast -->
+    <div class="forecast">
+      <div class="day">
+        <h3>Mon</h3>
+        <div class="icon">🌤</div>
+        <div class="temp">82°F</div>
+      </div>
+      <div class="day">
+        <h3>Tue</h3>
+        <div class="icon">⛅</div>
+        <div class="temp">80°F</div>
+      </div>
+      <div class="day">
+        <h3>Wed</h3>
+        <div class="icon">🌧</div>
+        <div class="temp">77°F</div>
+      </div>
+      <div class="day">
+        <h3>Thu</h3>
+        <div class="icon">⛈</div>
+        <div class="temp">75°F</div>
+      </div>
+      <div class="day">
+        <h3>Fri</h3>
+        <div class="icon">☀️</div>
+        <div class="temp">85°F</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
