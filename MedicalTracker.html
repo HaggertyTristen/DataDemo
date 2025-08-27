@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Medical Symptom Checker</title>
+<style>
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --muted:#6b7280;
+    --accent:#1f6feb;
+    --danger:#dc2626;
+    --ok:#16a34a;
+    --radius:12px;
+    --pad:16px;
+    color-scheme: light;
+  }
+  *{box-sizing:border-box}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;background:var(--bg);margin:0;color:#0f1724}
+  header{background:linear-gradient(90deg,var(--accent),#36b4ff);color:white;padding:22px;border-radius:0 0 16px 16px}
+  header h1{margin:0;font-size:20px}
+  .container{max-width:1000px;margin:22px auto;padding:0 16px}
+  .layout{display:grid;grid-template-columns:1fr 420px;gap:18px}
+  @media (max-width:980px){ .layout{grid-template-columns:1fr} }
+  .card{background:var(--card);border-radius:var(--radius);padding:var(--pad);box-shadow:0 6px 18px rgba(12,18,30,0.06);border:1px solid rgba(12,18,30,0.04)}
+  label{display:block;margin-top:10px;font-weight:600;color:#0f1724}
+  .row{display:flex;gap:8px}
+  input[type="text"], input[type="number"], select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6}
+  textarea{min-height:80px}
+  .symptom-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+  .symptom{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;border:1px solid rgba(12,18,30,0.04);background:linear-gradient(180deg,#fff,#fbfdff)}
+  button{background:var(--accent);color:white;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+  button.secondary{background:transparent;border:1px solid rgba(12,18,30,0.06);color:var(--muted);font-weight:600}
+  .muted{color:var(--muted);font-size:13px}
+  .results {display:flex;flex-direction:column;gap:12px}
+  .condition{border-radius:10px;padding:12px;border:1px solid rgba(12,18,30,0.04);background:linear-gradient(180deg,#fff,#fbfdff)}
+  .score {float:right;font-weight:800}
+  .emergency{background:linear-gradient(90deg,#ffe9e9,#fff0f0);border:1px solid rgba(220,38,38,0.1);padding:12px;border-radius:10px;color:var(--danger);font-weight:700}
+  .next-steps{margin-top:8px;padding:10px;border-radius:8px;background:#fff8e6;border:1px solid rgba(255,182,54,0.12)}
+  footer{max-width:1000px;margin:18px auto;text-align:center;color:var(--muted);font-size:13px}
+  .small{font-size:13px;color:var(--muted)}
+  .tag{display:inline-block;padding:6px 8px;border-radius:999px;background:#eef6ff;color:var(--accent);font-weight:700;margin-right:6px;font-size:13px}
+  .flex{display:flex;gap:8px;align-items:center}
+  .hr{height:1px;background:linear-gradient(90deg,transparent,#eef2f7,transparent);margin:12px 0}
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <h1>HealthCheck — Symptom Triage</h1>
+  </div>
+</header>
+
+<main class="container">
+  <div class="layout">
+    <!-- LEFT: Form -->
+    <section class="card">
+      <div class="flex">
+        <div>
+          <div style="font-weight:800">Symptom checker</div>
+          <div class="muted">Select symptoms & get possible conditions + next steps</div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <label>Age</label>
+      <input id="age" type="number" min="0" placeholder="e.g. 29">
+
+      <label>Sex</label>
+      <select id="sex">
+        <option value="unknown">Prefer not to say</option>
+        <option value="female">Female</option>
+        <option value="male">Male</option>
+        <option value="other">Other</option>
+      </select>
+
+      <label>Duration of symptoms</label>
+      <select id="duration">
+        <option value="0-1">Hours (0–24h)</option>
+        <option value="1-3">Days (1–3d)</option>
+        <option value="3-14">Weeks (3–14d)</option>
+        <option value="14+">2+ weeks</option>
+      </select>
+
+      <label>Severity</label>
+      <select id="severity">
+        <option value="mild">Mild</option>
+        <option value="moderate">Moderate</option>
+        <option value="severe">Severe</option>
+      </select>
+
+      <label>Common symptoms (check all that apply)</label>
+      <div class="symptom-grid" id="symptomGrid">
+        <!-- checkboxes populated by JS -->
+      </div>
+
+      <label>Other symptoms / notes (optional)</label>
+      <textarea id="freeText" placeholder="Add additional details (e.g., recent travel, meds, allergies)"></textarea>
+
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button id="checkBtn">Check Possible Conditions</button>
+        <button class="secondary" id="clearBtn">Clear</button>
+      </div>
+    </section>
+
+    <!-- RIGHT: Results -->
+    <aside class="card">
+      <div id="emergencyBox" style="display:none" class="emergency">
+        Possible emergency sign(s) detected — seek immediate medical attention or call emergency services.
+      </div>
+
+      <div id="resultsArea" class="results">
+        <div class="small muted">No check performed yet. Enter symptoms and press <strong>Check Possible Conditions</strong>.</div>
+      </div>
+
+      <div style="margin-top:12px">
+        <button class="secondary" id="exportBtn">Export Report (JSON)</button>
+        <button id="printBtn">Print Report</button>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer>
+  <div>HealthCheck — Symptom Triage</div>
+</footer>
+
+<script>
+/* === Same JavaScript engine as before === */
+const SYMPTOMS = [
+  "fever", "cough", "sore throat", "runny nose", "nasal congestion",
+  "shortness of breath", "chest pain", "palpitations", "dizziness",
+  "headache", "nausea", "vomiting", "diarrhea",
+  "abdominal pain", "fatigue", "muscle aches", "loss of taste or smell",
+  "rash", "itching", "urinary pain", "frequent urination",
+  "bleeding", "confusion", "severe weakness"
+];
+
+const CONDITIONS = [
+  { id:"common_cold", name:"Common Cold (Viral URI)", description:"Runny nose, sore throat, sneezing, mild cough.", weights:{ "runny nose":1, "sore throat":0.8, "cough":0.6, "fever":0.4, "headache":0.2, "fatigue":0.2 }, advice:"Rest, fluids, OTC relief. See doctor if >10 days." },
+  { id:"influenza", name:"Influenza (Flu)", description:"Rapid onset fever, body aches, cough, fatigue.", weights:{ "fever":1, "muscle aches":0.9, "cough":0.8, "fatigue":0.8, "headache":0.6, "nausea":0.3 }, advice:"Rest, fluids. Antivirals may help early." },
+  { id:"covid19", name:"COVID-19", description:"Fever, cough, loss of taste/smell, fatigue, SOB.", weights:{ "fever":0.9,"cough":0.8,"loss of taste or smell":1,"fatigue":0.6,"shortness of breath":0.9,"sore throat":0.4 }, advice:"Test per guidance. Isolate. Seek care if SOB." },
+  { id:"strep", name:"Strep Throat", description:"Sore throat, fever, swollen nodes.", weights:{ "sore throat":1,"fever":0.8,"headache":0.3,"cough":0.0 }, advice:"See clinician — may need antibiotics." },
+  { id:"migraine", name:"Migraine", description:"Severe headache, nausea, sensitivity to light.", weights:{ "headache":1,"nausea":0.6,"vomiting":0.4 }, advice:"Rest, OTC/prescription meds. Seek care if first severe episode." },
+  { id:"uti", name:"Urinary Tract Infection", description:"Painful/frequent urination, fever possible.", weights:{ "urinary pain":1,"frequent urination":0.9,"fever":0.3,"abdominal pain":0.4 }, advice:"See clinician — antibiotics may be needed." },
+  { id:"food_poisoning", name:"Food Poisoning", description:"Nausea, vomiting, diarrhea after meal.", weights:{ "nausea":1,"vomiting":1,"diarrhea":1,"abdominal pain":0.8,"fever":0.4 }, advice:"Hydration, rest. Seek care if severe." },
+  { id:"dehydration", name:"Dehydration", description:"Weakness, dizziness, dry mouth, low urine.", weights:{ "dizziness":0.8,"fatigue":0.6,"vomiting":0.6,"diarrhea":0.6,"severe weakness":0.9 }, advice:"Oral fluids. Care if severe." },
+  { id:"heart_attack", name:"Possible Cardiac Event", description:"Chest pain, SOB, nausea, sweating.", weights:{ "chest pain":1,"shortness of breath":0.9,"nausea":0.4,"dizziness":0.5 }, advice:"Call emergency services immediately." },
+  { id:"allergies", name:"Allergies", description:"Runny nose, sneezing, itchy eyes.", weights:{ "runny nose":0.8,"sneezing":1,"itching":0.9,"nasal congestion":0.7 }, advice:"Antihistamines, avoid triggers." }
+];
+
+const EMERGENCY_SYMPTOMS=["chest pain","shortness of breath","severe weakness","confusion","fainting","severe bleeding"];
+
+const symptomGrid=document.getElementById('symptomGrid');
+SYMPTOMS.forEach(sym=>{
+  const id='s-'+sym.replace(/\s+/g,'_');
+  const div=document.createElement('div');
+  div.className='symptom';
+  div.innerHTML=`<input type="checkbox" id="${id}" value="${sym}"><label for="${id}" style="margin:0">${sym[0].toUpperCase()+sym.slice(1)}</label>`;
+  symptomGrid.appendChild(div);
+});
+
+function getSelectedSymptoms(){
+  const selected=[];
+  SYMPTOMS.forEach(sym=>{
+    const el=document.querySelector('#s-'+sym.replace(/\s+/g,'_'));
+    if(el && el.checked) selected.push(sym);
+  });
+  return selected;
+}
+
+function scoreConditions(selected){
+  const results=[];
+  CONDITIONS.forEach(cond=>{
+    let score=0,max=0;
+    for(const [sym,w] of Object.entries(cond.weights)){
+      max+=w;
+      if(selected.includes(sym)) score+=w;
+    }
+    const normalized=max>0?(score/max):0;
+    results.push({id:cond.id,name:cond.name,score:normalized,description:cond.description,advice:cond.advice});
+  });
+  results.sort((a,b)=>b.score-a.score);
+  return results;
+}
+
+function hasEmergency(selected){
+  return EMERGENCY_SYMPTOMS.some(e=>selected.includes(e));
+}
+
+document.getElementById('checkBtn').addEventListener('click',()=>{
+  const selected=getSelectedSymptoms();
+  const emergency=hasEmergency(selected);
+  document.getElementById('emergencyBox').style.display=emergency?'block':'none';
+  const results=scoreConditions(selected);
+  renderResults(results,selected,emergency);
+});
+
+document.getElementById('clearBtn').addEventListener('click',()=>{
+  document.getElementById('age').value=''; document.getElementById('sex').value='unknown';
+  document.getElementById('duration').value='1-3'; document.getElementById('severity').value='mild';
+  SYMPTOMS.forEach(sym=>{const el=document.querySelector('#s-'+sym.replace(/\s+/g,'_'));if(el)el.checked=false;});
+  document.getElementById('freeText').value='';
+  document.getElementById('resultsArea').innerHTML='<div class="small muted">No check performed yet.</div>';
+  document.getElementById('emergencyBox').style.display='none';
+});
+
+function renderResults(results,selected,emergency){
+  const area=document.getElementById('resultsArea');
+  area.innerHTML='';
+  const summary=document.createElement('div');
+  summary.className='card';
+  summary.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><div>
+  <div style="font-weight:800">Summary</div>
+  <div class="muted small">${selected.length} symptom(s) selected</div></div>
+  <div style="text-align:right"><div class="small muted">Confidence</div><div style="font-weight:900">${(results[0].score*100).toFixed(0)}%</div></div></div>`;
+  area.appendChild(summary);
+  results.slice(0,5).forEach(r=>{
+    const cond=document.createElement('div');
+    cond.className='condition';
+    cond.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:800">${r.name}</div>
+      <div class="score">${Math.round(r.score*100)}%</div>
+    </div>
+    <div class="muted small" style="margin-top:6px">${r.description}</div>
+    <div class="next-steps" style="margin-top:8px"><strong>Next steps:</strong> ${r.advice}</div>`;
+    area.appendChild(cond);
+  });
+}
+
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  const report={timestamp:new Date().toISOString(),age:document.getElementById('age').value||null,sex:document.getElementById('sex').value,symptoms:getSelectedSymptoms()};
+  const blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='symptom_report.json';a.click();
+});
+document.getElementById('printBtn').addEventListener('click',()=>window.print());
+</script>
+</body>
+</html>
