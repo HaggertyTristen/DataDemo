@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Health Tracker Dashboard</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    header {
+      background: #4caf50;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 1.6em;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .container {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .left, .right {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #4caf50;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      width: 100%;
+    }
+
+    button {
+      background: #4caf50;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #388e3c;
+    }
+
+    .dashboard-card {
+      background: #e8f5e9;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <header>🏃‍♂️ My Health Tracker</header>
+
+  <div class="container">
+    <!-- Left Panel: Input Data -->
+    <div class="left">
+      <h2>Daily Input</h2>
+      <input type="number" id="steps" placeholder="Steps walked">
+      <input type="number" id="water" placeholder="Water intake (cups)">
+      <input type="number" id="sleep" placeholder="Sleep hours">
+      <button onclick="addEntry()">Add Entry</button>
+
+      <div class="dashboard-card">
+        <p>Total Steps: <span id="totalSteps">0</span></p>
+        <p>Total Water: <span id="totalWater">0</span> cups</p>
+        <p>Total Sleep: <span id="totalSleep">0</span> hours</p>
+      </div>
+    </div>
+
+    <!-- Right Panel: History -->
+    <div class="right">
+      <h2>History</h2>
+      <ul id="historyList"></ul>
+    </div>
+  </div>
+
+  <script>
+    let totalSteps = 0;
+    let totalWater = 0;
+    let totalSleep = 0;
+    let history = [];
+
+    function addEntry() {
+      const steps = parseInt(document.getElementById("steps").value) || 0;
+      const water = parseInt(document.getElementById("water").value) || 0;
+      const sleep = parseFloat(document.getElementById("sleep").value) || 0;
+
+      if(steps <= 0 && water <= 0 && sleep <= 0) {
+        alert("Please enter some data!");
+        return;
+      }
+
+      totalSteps += steps;
+      totalWater += water;
+      totalSleep += sleep;
+
+      history.push(`Steps: ${steps}, Water: ${water} cups, Sleep: ${sleep} hrs`);
+
+      document.getElementById("totalSteps").innerText = totalSteps;
+      document.getElementById("totalWater").innerText = totalWater;
+      document.getElementById("totalSleep").innerText = totalSleep;
+
+      renderHistory();
+
+      // Reset inputs
+      document.getElementById("steps").value = "";
+      document.getElementById("water").value = "";
+      document.getElementById("sleep").value = "";
+    }
+
+    function renderHistory() {
+      const list = document.getElementById("historyList");
