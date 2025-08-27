@@ -3,175 +3,169 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Health Symptom Checker</title>
+  <title>Medical Symptom Checker</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f7fb;
+      background: #f4f8fc;
+      color: #333;
       margin: 0;
       padding: 0;
-      color: #333;
     }
 
     header {
-      background: #2d89ef;
+      background: #0077b6;
       color: white;
       padding: 20px;
       text-align: center;
+      font-size: 26px;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
     .container {
-      display: flex;
-      gap: 30px;
-      max-width: 1200px;
+      max-width: 900px;
       margin: 40px auto;
-      padding: 20px;
-    }
-
-    .card {
       background: white;
+      padding: 30px;
       border-radius: 12px;
-      padding: 25px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      flex: 1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
     h2 {
-      color: #2d89ef;
       margin-bottom: 15px;
+      color: #0077b6;
     }
 
-    label {
-      display: block;
-      margin-bottom: 8px;
-      cursor: pointer;
-    }
-
-    button {
-      background: #2d89ef;
-      color: white;
-      border: none;
-      padding: 12px 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      margin-top: 15px;
-    }
-
-    button:hover {
-      background: #2265b3;
-    }
-
-    .result-box {
-      background: #f9fbff;
-      padding: 20px;
-      border-radius: 10px;
-      border: 1px solid #dce6f5;
-      margin-top: 15px;
-    }
-
-    .diary-entry {
-      background: #eef3fc;
+    select, button {
+      width: 100%;
       padding: 12px;
       margin-top: 10px;
       border-radius: 8px;
-      border-left: 5px solid #2d89ef;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      background: #0096c7;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #0077b6;
+    }
+
+    .results {
+      margin-top: 30px;
+    }
+
+    .condition {
+      margin-bottom: 15px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #f9fcff;
+    }
+
+    .condition h3 {
+      margin: 0 0 5px;
+      font-size: 18px;
+      color: #023e8a;
+    }
+
+    .progress {
+      background: #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 18px;
+    }
+
+    .progress-bar {
+      height: 18px;
+      background: linear-gradient(90deg, #0077b6, #0096c7);
+      width: 0%;
+      text-align: center;
+      color: white;
+      font-size: 12px;
+      line-height: 18px;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Health Symptom Checker</h1>
-    <p>Enter your symptoms to see possible conditions & track them over time</p>
+    🩺 Medical Symptom Checker
   </header>
 
   <div class="container">
-    <!-- Symptom Selection -->
-    <div class="card">
-      <h2>Select Your Symptoms</h2>
+    <h2>Select Your Symptoms</h2>
+    <p>Choose all that apply (hold CTRL or CMD to select multiple):</p>
+    <select id="symptomSelect" multiple size="10">
+      <option>Fever</option>
+      <option>Cough</option>
+      <option>Headache</option>
+      <option>Sore throat</option>
+      <option>Fatigue</option>
+      <option>Runny nose</option>
+      <option>Shortness of breath</option>
+      <option>Chest pain</option>
+      <option>Stomach pain</option>
+      <option>Nausea</option>
+      <option>Vomiting</option>
+      <option>Diarrhea</option>
+      <option>Dizziness</option>
+      <option>Loss of smell</option>
+      <option>Loss of taste</option>
+      <option>Muscle aches</option>
+      <option>Joint pain</option>
+      <option>Rash</option>
+      <option>Chills</option>
+      <option>Weight loss</option>
+      <option>Weight gain</option>
+      <option>Swollen lymph nodes</option>
+      <option>Night sweats</option>
+      <option>Confusion</option>
+      <option>Memory loss</option>
+    </select>
+    <button onclick="checkSymptoms()">Check Possible Conditions</button>
 
-      <h3>General</h3>
-      <label><input type="checkbox" value="fever"> Fever</label>
-      <label><input type="checkbox" value="fatigue"> Fatigue</label>
-      <label><input type="checkbox" value="weightloss"> Unexplained Weight Loss</label>
-
-      <h3>Respiratory</h3>
-      <label><input type="checkbox" value="cough"> Cough</label>
-      <label><input type="checkbox" value="shortbreath"> Shortness of Breath</label>
-      <label><input type="checkbox" value="chestpain"> Chest Pain</label>
-
-      <h3>Digestive</h3>
-      <label><input type="checkbox" value="nausea"> Nausea</label>
-      <label><input type="checkbox" value="vomiting"> Vomiting</label>
-      <label><input type="checkbox" value="diarrhea"> Diarrhea</label>
-      <label><input type="checkbox" value="stomachpain"> Stomach Pain</label>
-
-      <button onclick="checkSymptoms()">Check Possible Conditions</button>
-    </div>
-
-    <!-- Results + Diary -->
-    <div class="card" style="flex: 2;">
-      <h2>Possible Conditions</h2>
-      <div id="results" class="result-box">
-        <p>Select your symptoms and click the button to see results.</p>
-      </div>
-
-      <h2 style="margin-top:30px;">Symptom Diary</h2>
-      <p>Log your symptoms and when they started:</p>
-      <input type="date" id="diaryDate">
-      <input type="text" id="diarySymptoms" placeholder="Describe symptoms..." style="width:60%; padding:8px; margin-left:10px; border-radius:6px; border:1px solid #ccc;">
-      <button onclick="addDiaryEntry()">Add Entry</button>
-
-      <div id="diaryLog" style="margin-top:15px;"></div>
-    </div>
+    <div id="results" class="results"></div>
   </div>
 
   <script>
+    const conditions = {
+      "Flu": ["Fever", "Cough", "Headache", "Fatigue", "Sore throat", "Chills", "Muscle aches"],
+      "COVID-19": ["Fever", "Cough", "Loss of smell", "Loss of taste", "Fatigue", "Shortness of breath"],
+      "Common Cold": ["Runny nose", "Sore throat", "Cough", "Fatigue"],
+      "Food Poisoning": ["Nausea", "Vomiting", "Diarrhea", "Stomach pain", "Fever"],
+      "Migraine": ["Headache", "Nausea", "Dizziness", "Sensitivity to light"],
+      "Pneumonia": ["Fever", "Cough", "Chest pain", "Shortness of breath", "Fatigue"],
+      "Allergies": ["Runny nose", "Sore throat", "Fatigue", "Rash"],
+      "Diabetes": ["Weight loss", "Fatigue", "Frequent urination", "Excessive thirst"],
+      "Lymphoma": ["Swollen lymph nodes", "Night sweats", "Fatigue", "Weight loss"],
+      "Alzheimer’s Disease": ["Memory loss", "Confusion"]
+    };
+
     function checkSymptoms() {
-      const symptoms = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
-                            .map(cb => cb.value);
+      const selected = Array.from(document.getElementById("symptomSelect").selectedOptions).map(opt => opt.value);
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "<h2>Possible Conditions</h2>";
 
-      let conditions = [];
-
-      if (symptoms.includes("fever") && symptoms.includes("cough") && symptoms.includes("shortbreath")) {
-        conditions.push("Possible: Flu, COVID-19, or Pneumonia");
+      for (let [condition, symps] of Object.entries(conditions)) {
+        let matchCount = selected.filter(s => symps.includes(s)).length;
+        if (matchCount > 0) {
+          let percent = Math.round((matchCount / symps.length) * 100);
+          resultsDiv.innerHTML += `
+            <div class="condition">
+              <h3>${condition}</h3>
+              <div class="progress">
+                <div class="progress-bar" style="width:${percent}%">${percent}%</div>
+              </div>
+            </div>`;
+        }
       }
-      if (symptoms.includes("nausea") && symptoms.includes("vomiting") && symptoms.includes("diarrhea")) {
-        conditions.push("Possible: Food Poisoning, Stomach Virus, or Gastroenteritis");
-      }
-      if (symptoms.includes("chestpain") && symptoms.includes("shortbreath")) {
-        conditions.push("Possible: Asthma, Heart Disease, or Anxiety");
-      }
-      if (symptoms.includes("fatigue") && symptoms.includes("weightloss")) {
-        conditions.push("Possible: Thyroid Issues, Diabetes, or Cancer");
-      }
-
-      if (conditions.length === 0) {
-        conditions.push("No specific matches found. Try selecting more symptoms.");
-      }
-
-      document.getElementById("results").innerHTML =
-        "<ul>" + conditions.map(c => `<li>${c}</li>`).join("") + "</ul>";
-    }
-
-    function addDiaryEntry() {
-      const date = document.getElementById("diaryDate").value;
-      const symptoms = document.getElementById("diarySymptoms").value;
-
-      if (!date || !symptoms) {
-        alert("Please enter both date and symptoms.");
-        return;
-      }
-
-      const log = document.getElementById("diaryLog");
-      const entry = document.createElement("div");
-      entry.className = "diary-entry";
-      entry.innerHTML = `<strong>${date}</strong>: ${symptoms}`;
-      log.appendChild(entry);
-
-      // Reset fields
-      document.getElementById("diaryDate").value = "";
-      document.getElementById("diarySymptoms").value = "";
     }
   </script>
 </body>
