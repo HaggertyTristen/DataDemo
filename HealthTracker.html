@@ -1,170 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Advanced Health Tracker</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #eef2f6;
-      color: #2c3e50;
-    }
-
-    header {
-      background: #4caf50;
-      color: white;
-      text-align: center;
-      padding: 20px;
-      font-size: 1.8em;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: auto;
-      padding: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-      flex: 1 1 300px;
-    }
-
-    h2 {
-      margin-top: 0;
-      color: #4caf50;
-    }
-
-    input, button {
-      padding: 10px;
-      margin: 6px 0;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      width: 100%;
-      font-size: 14px;
-    }
-
-    button {
-      background: #4caf50;
-      color: white;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #388e3c;
-    }
-
-    .dashboard-cards {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .dashboard-card {
-      flex: 1;
-      min-width: 150px;
-      background: #e8f5e9;
-      padding: 15px;
-      border-radius: 8px;
-      text-align: center;
-      font-weight: bold;
-    }
-
-    .progress-bar {
-      background: #c8e6c9;
-      border-radius: 6px;
-      overflow: hidden;
-      height: 15px;
-      margin-top: 5px;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: #4caf50;
-      width: 0%;
-      transition: width 0.3s;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-
-    th, td {
-      padding: 8px;
-      border: 1px solid #ccc;
-      text-align: center;
-    }
-
-    th {
-      background: #4caf50;
-      color: white;
-    }
-
-    @media(max-width: 900px){
-      .dashboard-cards {
-        flex-direction: column;
-      }
-    }
-  </style>
-</head>
-<body>
-  <header>🏃‍♂️ Advanced Health Tracker</header>
-
-  <div class="container">
-    <!-- Input Card -->
-    <div class="card">
-      <h2>Daily Input</h2>
-      <input type="number" id="steps" placeholder="Steps walked">
-      <input type="number" id="water" placeholder="Water intake (cups)">
-      <input type="number" id="sleep" placeholder="Sleep hours">
-      <button onclick="addEntry()">Add Entry</button>
-    </div>
-
-    <!-- Dashboard Cards -->
-    <div class="card dashboard-cards">
-      <div class="dashboard-card">
-        Steps: <span id="totalSteps">0</span>
-        <div class="progress-bar"><div class="progress-fill" id="stepsProgress"></div></div>
-      </div>
-      <div class="dashboard-card">
-        Water (cups): <span id="totalWater">0</span>
-        <div class="progress-bar"><div class="progress-fill" id="waterProgress"></div></div>
-      </div>
-      <div class="dashboard-card">
-        Sleep (hrs): <span id="totalSleep">0</span>
-        <div class="progress-bar"><div class="progress-fill" id="sleepProgress"></div></div>
-      </div>
-    </div>
-
-    <!-- History Table -->
-    <div class="card">
-      <h2>History</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Steps</th>
-            <th>Water</th>
-            <th>Sleep</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="historyTable"></tbody>
-      </table>
-    </div>
-
-    <!-- Charts
+<meta charset="UTF-8">
+<title>My Health Tracker</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 0;
+    background: #f5f7fa;
+    color: #2c3e50;
+  }
+  header {
+    background: #6ab04c;
+    color: white;
+    padding: 20px;
+    font-size: 1.8em;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .card {
+    background: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    flex: 1;
+    min-width: 150px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  }
+  .card h3 { margin: 0; font-weight: 600; }
+  .progress-bar {
+    background: #e0e0e0;
+    border-radius: 6px;
+    height: 10px;
+    margin-top: 5px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: #6ab04c;
+    width: 0%;
+    border-radius: 6px;
+  }
+  .charts { display: flex; gap: 20px; flex-wrap:
