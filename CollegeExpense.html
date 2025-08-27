@@ -6,14 +6,42 @@
   <style>
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f7fa;
+      background: #eef2f6;
       margin: 0;
       padding: 20px;
-      color: #333;
+      color: #2c3e50;
     }
     h1 {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+      color: #1c3d5a;
+    }
+    .summary {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+    .summary-card {
+      flex: 1;
+      max-width: 280px;
+      background: #ffffff;
+      border: 1px solid #d9e2ec;
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .summary-card h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      color: #5a7184;
+    }
+    .summary-card p {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 0;
+      color: #1c3d5a;
     }
     .dashboard {
       display: flex;
@@ -28,61 +56,66 @@
       gap: 20px;
     }
     .card {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+      background: #ffffff;
+      border: 1px solid #d9e2ec;
+      border-radius: 10px;
       padding: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     h2 {
       margin-top: 0;
+      font-size: 18px;
+      color: #1c3d5a;
     }
     input, button {
-      padding: 8px;
-      margin: 6px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #cbd5e0;
+      border-radius: 8px;
       width: 100%;
       font-size: 14px;
     }
     button {
-      background: #2d89ef;
+      background: #1c7ed6;
       color: #fff;
+      font-weight: 600;
       border: none;
       cursor: pointer;
       transition: 0.2s;
     }
     button:hover {
-      background: #1c5fb8;
+      background: #1864ab;
     }
     ul {
       padding-left: 20px;
+      margin: 0;
     }
-    /* Calendar Styling */
+    /* Calendar */
     .calendar {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 8px;
     }
     .day {
-      background: #f9f9f9;
-      border: 1px solid #ddd;
-      border-radius: 6px;
+      background: #f8fafc;
+      border: 1px solid #d9e2ec;
+      border-radius: 8px;
       min-height: 90px;
-      padding: 5px;
+      padding: 6px;
       font-size: 12px;
       position: relative;
     }
     .day span {
       font-weight: bold;
+      color: #1c3d5a;
     }
     .expense-tag {
       display: block;
-      background: #ffefef;
-      color: #a00;
-      padding: 2px 4px;
+      background: #e3f2fd;
+      color: #0d47a1;
+      padding: 3px 5px;
       border-radius: 4px;
-      margin-top: 2px;
+      margin-top: 3px;
       font-size: 11px;
       word-break: break-word;
     }
@@ -91,11 +124,31 @@
       .dashboard {
         flex-direction: column;
       }
+      .summary {
+        flex-direction: column;
+        align-items: center;
+      }
     }
   </style>
 </head>
 <body>
   <h1>College Budget & Calendar Tracker</h1>
+
+  <!-- Summary -->
+  <div class="summary">
+    <div class="summary-card">
+      <h3>Monthly Budget</h3>
+      <p id="summaryBudget">$0</p>
+    </div>
+    <div class="summary-card">
+      <h3>Total Spent</h3>
+      <p id="summarySpent">$0</p>
+    </div>
+    <div class="summary-card">
+      <h3>Remaining</h3>
+      <p id="summaryRemaining">$0</p>
+    </div>
+  </div>
   
   <div class="dashboard">
     <!-- Left Panel -->
@@ -105,7 +158,6 @@
         <h2>Set Monthly Budget</h2>
         <input type="number" id="budgetInput" placeholder="Enter monthly budget ($)">
         <button onclick="setBudget()">Save Budget</button>
-        <p id="budgetDisplay"></p>
       </div>
 
       <!-- Expense Form -->
@@ -139,8 +191,7 @@
 
     function setBudget() {
       budget = parseFloat(document.getElementById("budgetInput").value) || 0;
-      document.getElementById("budgetDisplay").textContent = 
-        "Monthly Budget: $" + budget.toFixed(2);
+      updateSummary();
     }
 
     function addExpense() {
@@ -157,6 +208,7 @@
       expenses.push(expense);
       updateExpenseList();
       renderCalendar();
+      updateSummary();
 
       document.getElementById("expenseName").value = "";
       document.getElementById("expenseAmount").value = "";
@@ -173,6 +225,14 @@
       });
     }
 
+    function updateSummary() {
+      const spent = expenses.reduce((sum, e) => sum + e.amount, 0);
+      const remaining = budget - spent;
+      document.getElementById("summaryBudget").textContent = "$" + budget.toFixed(2);
+      document.getElementById("summarySpent").textContent = "$" + spent.toFixed(2);
+      document.getElementById("summaryRemaining").textContent = "$" + remaining.toFixed(2);
+    }
+
     function renderCalendar() {
       const calendar = document.getElementById("calendar");
       calendar.innerHTML = "";
@@ -184,13 +244,13 @@
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-      // Empty slots before first day
+      // Empty slots
       for (let i = 0; i < firstDay; i++) {
         const empty = document.createElement("div");
         calendar.appendChild(empty);
       }
 
-      // Fill days
+      // Days
       for (let d = 1; d <= daysInMonth; d++) {
         const dayBox = document.createElement("div");
         dayBox.className = "day";
@@ -211,7 +271,6 @@
       }
     }
 
-    // Initial
     renderCalendar();
   </script>
 </body>
