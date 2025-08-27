@@ -1,407 +1,178 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Medical Symptom Checker — Prototype</title>
-<style>
-  :root{
-    --bg:#f4f7fb;
-    --card:#ffffff;
-    --muted:#6b7280;
-    --accent:#1f6feb;
-    --danger:#dc2626;
-    --ok:#16a34a;
-    --radius:12px;
-    --pad:16px;
-    color-scheme: light;
-  }
-  *{box-sizing:border-box}
-  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;background:var(--bg);margin:0;color:#0f1724}
-  header{background:linear-gradient(90deg,var(--accent),#36b4ff);color:white;padding:22px;border-radius:0 0 16px 16px}
-  header h1{margin:0;font-size:20px}
-  .container{max-width:1000px;margin:22px auto;padding:0 16px}
-  .layout{display:grid;grid-template-columns:1fr 420px;gap:18px}
-  @media (max-width:980px){ .layout{grid-template-columns:1fr} }
-  .card{background:var(--card);border-radius:var(--radius);padding:var(--pad);box-shadow:0 6px 18px rgba(12,18,30,0.06);border:1px solid rgba(12,18,30,0.04)}
-  label{display:block;margin-top:10px;font-weight:600;color:#0f1724}
-  .row{display:flex;gap:8px}
-  input[type="text"], input[type="number"], select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6}
-  textarea{min-height:80px}
-  .symptom-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
-  .symptom{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;border:1px solid rgba(12,18,30,0.04);background:linear-gradient(180deg,#fff,#fbfdff)}
-  button{background:var(--accent);color:white;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
-  button.secondary{background:transparent;border:1px solid rgba(12,18,30,0.06);color:var(--muted);font-weight:600}
-  .muted{color:var(--muted);font-size:13px}
-  .results {display:flex;flex-direction:column;gap:12px}
-  .condition{border-radius:10px;padding:12px;border:1px solid rgba(12,18,30,0.04);background:linear-gradient(180deg,#fff,#fbfdff)}
-  .score {float:right;font-weight:800}
-  .emergency{background:linear-gradient(90deg,#ffe9e9,#fff0f0);border:1px solid rgba(220,38,38,0.1);padding:12px;border-radius:10px;color:var(--danger);font-weight:700}
-  .next-steps{margin-top:8px;padding:10px;border-radius:8px;background:#fff8e6;border:1px solid rgba(255,182,54,0.12)}
-  footer{max-width:1000px;margin:18px auto;text-align:center;color:var(--muted);font-size:13px}
-  .small{font-size:13px;color:var(--muted)}
-  .tag{display:inline-block;padding:6px 8px;border-radius:999px;background:#eef6ff;color:var(--accent);font-weight:700;margin-right:6px;font-size:13px}
-  .flex{display:flex;gap:8px;align-items:center}
-  .hr{height:1px;background:linear-gradient(90deg,transparent,#eef2f7,transparent);margin:12px 0}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Health Symptom Checker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    header {
+      background: #2d89ef;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      display: flex;
+      gap: 30px;
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      flex: 1;
+    }
+
+    h2 {
+      color: #2d89ef;
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    button {
+      background: #2d89ef;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 15px;
+    }
+
+    button:hover {
+      background: #2265b3;
+    }
+
+    .result-box {
+      background: #f9fbff;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #dce6f5;
+      margin-top: 15px;
+    }
+
+    .diary-entry {
+      background: #eef3fc;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border-left: 5px solid #2d89ef;
+    }
+  </style>
 </head>
 <body>
-<header>
+  <header>
+    <h1>Health Symptom Checker</h1>
+    <p>Enter your symptoms to see possible conditions & track them over time</p>
+  </header>
+
   <div class="container">
-    <h1>HealthCheck — Symptom Triage (Demo)</h1>
-    <div class="small">Educational prototype. Not a substitute for medical advice. For emergencies call local emergency services.</div>
+    <!-- Symptom Selection -->
+    <div class="card">
+      <h2>Select Your Symptoms</h2>
+
+      <h3>General</h3>
+      <label><input type="checkbox" value="fever"> Fever</label>
+      <label><input type="checkbox" value="fatigue"> Fatigue</label>
+      <label><input type="checkbox" value="weightloss"> Unexplained Weight Loss</label>
+
+      <h3>Respiratory</h3>
+      <label><input type="checkbox" value="cough"> Cough</label>
+      <label><input type="checkbox" value="shortbreath"> Shortness of Breath</label>
+      <label><input type="checkbox" value="chestpain"> Chest Pain</label>
+
+      <h3>Digestive</h3>
+      <label><input type="checkbox" value="nausea"> Nausea</label>
+      <label><input type="checkbox" value="vomiting"> Vomiting</label>
+      <label><input type="checkbox" value="diarrhea"> Diarrhea</label>
+      <label><input type="checkbox" value="stomachpain"> Stomach Pain</label>
+
+      <button onclick="checkSymptoms()">Check Possible Conditions</button>
+    </div>
+
+    <!-- Results + Diary -->
+    <div class="card" style="flex: 2;">
+      <h2>Possible Conditions</h2>
+      <div id="results" class="result-box">
+        <p>Select your symptoms and click the button to see results.</p>
+      </div>
+
+      <h2 style="margin-top:30px;">Symptom Diary</h2>
+      <p>Log your symptoms and when they started:</p>
+      <input type="date" id="diaryDate">
+      <input type="text" id="diarySymptoms" placeholder="Describe symptoms..." style="width:60%; padding:8px; margin-left:10px; border-radius:6px; border:1px solid #ccc;">
+      <button onclick="addDiaryEntry()">Add Entry</button>
+
+      <div id="diaryLog" style="margin-top:15px;"></div>
+    </div>
   </div>
-</header>
 
-<main class="container">
-  <div class="layout">
-    <!-- LEFT: Form -->
-    <section class="card">
-      <div class="flex">
-        <div class="tag">Demo</div>
-        <div>
-          <div style="font-weight:800">Symptom checker</div>
-          <div class="muted">Select symptoms & get possible conditions + next steps</div>
-        </div>
-      </div>
+  <script>
+    function checkSymptoms() {
+      const symptoms = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                            .map(cb => cb.value);
 
-      <div class="hr"></div>
+      let conditions = [];
 
-      <label>Age</label>
-      <input id="age" type="number" min="0" placeholder="e.g. 29">
+      if (symptoms.includes("fever") && symptoms.includes("cough") && symptoms.includes("shortbreath")) {
+        conditions.push("Possible: Flu, COVID-19, or Pneumonia");
+      }
+      if (symptoms.includes("nausea") && symptoms.includes("vomiting") && symptoms.includes("diarrhea")) {
+        conditions.push("Possible: Food Poisoning, Stomach Virus, or Gastroenteritis");
+      }
+      if (symptoms.includes("chestpain") && symptoms.includes("shortbreath")) {
+        conditions.push("Possible: Asthma, Heart Disease, or Anxiety");
+      }
+      if (symptoms.includes("fatigue") && symptoms.includes("weightloss")) {
+        conditions.push("Possible: Thyroid Issues, Diabetes, or Cancer");
+      }
 
-      <label>Sex</label>
-      <select id="sex">
-        <option value="unknown">Prefer not to say</option>
-        <option value="female">Female</option>
-        <option value="male">Male</option>
-        <option value="other">Other</option>
-      </select>
+      if (conditions.length === 0) {
+        conditions.push("No specific matches found. Try selecting more symptoms.");
+      }
 
-      <label>Duration of symptoms</label>
-      <select id="duration">
-        <option value="0-1">Hours (0–24h)</option>
-        <option value="1-3">Days (1–3d)</option>
-        <option value="3-14">Weeks (3–14d)</option>
-        <option value="14+">2+ weeks</option>
-      </select>
-
-      <label>Severity</label>
-      <select id="severity">
-        <option value="mild">Mild</option>
-        <option value="moderate">Moderate</option>
-        <option value="severe">Severe</option>
-      </select>
-
-      <label>Common symptoms (check all that apply)</label>
-      <div class="symptom-grid" id="symptomGrid">
-        <!-- checkboxes populated by JS -->
-      </div>
-
-      <label>Other symptoms / notes (optional)</label>
-      <textarea id="freeText" placeholder="Add additional details (e.g., recent travel, meds, allergies)"></textarea>
-
-      <div style="display:flex;gap:8px;margin-top:12px">
-        <button id="checkBtn">Check Possible Conditions</button>
-        <button class="secondary" id="clearBtn">Clear</button>
-      </div>
-
-      <div style="margin-top:12px" class="small muted">
-        <strong>Disclaimer:</strong> This tool is for informational purposes only. It does not provide medical advice, diagnosis, or treatment. If you are experiencing a medical emergency (chest pain, severe difficulty breathing, fainting, severe bleeding), call emergency services immediately.
-      </div>
-    </section>
-
-    <!-- RIGHT: Results -->
-    <aside class="card">
-      <div id="emergencyBox" style="display:none" class="emergency">
-        Possible emergency sign(s) detected — seek immediate medical attention or call emergency services.
-      </div>
-
-      <div id="resultsArea" class="results">
-        <div class="small muted">No check performed yet. Enter symptoms and press <strong>Check Possible Conditions</strong>.</div>
-      </div>
-
-      <div style="margin-top:12px">
-        <button class="secondary" id="exportBtn">Export Report (JSON)</button>
-        <button id="printBtn">Print Report</button>
-      </div>
-    </aside>
-  </div>
-</main>
-
-<footer>
-  <div>HealthCheck prototype — educational only. Not a medical device.</div>
-</footer>
-
-<script>
-/* ======= Simple rule-based symptom -> condition mapping engine (prototype) =======
-   This is a demo algorithm for educational purposes. It uses symptom weights and
-   returns ranked possible conditions with explanation + suggested next steps.
-   Always recommend clinician evaluation.
-*/
-
-// 1) symptom list
-const SYMPTOMS = [
-  "fever", "cough", "sore throat", "runny nose", "nasal congestion",
-  "shortness of breath", "chest pain", "palpitations", "dizziness",
-  "headache", "nausea", "vomiting", "diarrhea",
-  "abdominal pain", "fatigue", "muscle aches", "loss of taste or smell",
-  "rash", "itching", "urinary pain", "frequent urination",
-  "bleeding", "confusion", "severe weakness"
-];
-
-// 2) condition definitions with symptom weightings (simplified demo)
-const CONDITIONS = [
-  {
-    id: "common_cold",
-    name: "Common Cold (Viral Upper Respiratory Infection)",
-    description: "Runny nose, sore throat, sneezing, mild cough. Usually gradual and milder than flu.",
-    weights: { "runny nose":1, "sore throat":0.8, "cough":0.6, "fever":0.4, "headache":0.2, "fatigue":0.2 },
-    advice: "Rest, fluids, OTC symptomatic relief. See PCP if symptoms worsen or last >10 days."
-  },
-  {
-    id: "influenza",
-    name: "Influenza (Flu)",
-    description: "Rapid onset fever, body aches, cough, fatigue, sometimes vomiting/diarrhea (in children).",
-    weights: { "fever":1, "muscle aches":0.9, "cough":0.8, "fatigue":0.8, "headache":0.6, "nausea":0.3 },
-    advice: "Rest, fluids. Antiviral therapy may be recommended early; see clinician especially for high-risk patients."
-  },
-  {
-    id: "covid19",
-    name: "COVID-19 (SARS-CoV-2)",
-    description: "Variable: fever, cough, loss of taste/smell, fatigue, shortness of breath in severe cases.",
-    weights: { "fever":0.9, "cough":0.8, "loss of taste or smell":1, "fatigue":0.6, "shortness of breath":0.9, "sore throat":0.4 },
-    advice: "Test per local guidance. Isolate per public health guidance. Seek care if breathing difficulty or worsening."
-  },
-  {
-    id: "strep_throat",
-    name: "Streptococcal Pharyngitis (Strep Throat)",
-    description: "Sore throat, fever, swollen lymph nodes, lack of cough (often).",
-    weights: { "sore throat":1, "fever":0.8, "headache":0.3, "cough":0.0 },
-    advice: "See clinician — may require antibiotics after testing."
-  },
-  {
-    id: "migraine",
-    name: "Migraine Headache",
-    description: "Severe, often one-sided headache, may have nausea, sensitivity to light/noise.",
-    weights: { "headache":1, "nausea":0.6, "vomiting":0.4, "sensitivity":0.3 },
-    advice: "Rest in dark room, OTC or prescription meds as advised. See clinician if first severe headache or neurological signs."
-  },
-  {
-    id: "uti",
-    name: "Urinary Tract Infection (UTI)",
-    description: "Painful or frequent urination, urgency, sometimes fever or lower abdominal discomfort.",
-    weights: { "urinary pain":1, "frequent urination":0.9, "fever":0.3, "abdominal pain":0.4 },
-    advice: "See clinician — antibiotics may be needed. Drink fluids; seek urgent care if fever/high pain."
-  },
-  {
-    id: "food_poisoning",
-    name: "Food Poisoning / Gastroenteritis",
-    description: "Nausea, vomiting, diarrhea often after recent meal; abdominal cramps and sometimes fever.",
-    weights: { "nausea":1, "vomiting":1, "diarrhea":1, "abdominal pain":0.8, "fever":0.4 },
-    advice: "Hydration, rest. Seek care if severe dehydration, blood in stool, high fever, or lasting symptoms."
-  },
-  {
-    id: "dehydration",
-    name: "Dehydration",
-    description: "Weakness, dizziness, dry mouth, decreased urine output; often after vomiting/diarrhea or heat exposure.",
-    weights: { "dizziness":0.8, "fatigue":0.6, "vomiting":0.6, "diarrhea":0.6, "severe weakness":0.9 },
-    advice: "Oral rehydration solutions, seek medical care if severe or unable to keep fluids down."
-  },
-  {
-    id: "heart_attack",
-    name: "Possible Cardiac Event (e.g., Heart Attack)",
-    description: "Chest pain, pressure, shortness of breath, nausea, sweating, fainting. Serious and potentially life-threatening.",
-    weights: { "chest pain":1, "shortness of breath":0.9, "nausea":0.4, "dizziness":0.5, "sweating":0.6 },
-    advice: "Emergency — call local emergency services immediately if suspected."
-  },
-  {
-    id: "allergic_rhinitis",
-    name: "Allergic Rhinitis (Allergies)",
-    description: "Runny nose, sneezing, itchy eyes; often seasonal or triggered by exposures.",
-    weights: { "runny nose":0.8, "sneezing":1, "itching":0.9, "nasal congestion":0.7 },
-    advice: "Antihistamines, avoid triggers. See allergist if persistent or severe."
-  },
-  {
-    id: "covid_long",
-    name: "Post-viral / Fatigue (Post-acute)",
-    description: "Prolonged fatigue and variable symptoms following infection.",
-    weights: { "fatigue":1, "headache":0.4, "muscle aches":0.3 },
-    advice: "Primary care follow-up for prolonged symptoms (>4 weeks)."
-  }
-];
-
-// emergency symptom keywords
-const EMERGENCY_SYMPTOMS = ["chest pain","shortness of breath","severe weakness","confusion","fainting","severe bleeding"];
-
-// build symptom controls
-const symptomGrid = document.getElementById('symptomGrid');
-SYMPTOMS.forEach(sym => {
-  const id = 's-'+sym.replace(/\s+/g,'_');
-  const div = document.createElement('div');
-  div.className = 'symptom';
-  div.innerHTML = `<input type="checkbox" id="${id}" value="${sym}"><label for="${id}" style="margin:0">${sym[0].toUpperCase()+sym.slice(1)}</label>`;
-  symptomGrid.appendChild(div);
-});
-
-// helpers
-function getSelectedSymptoms(){
-  const selected = [];
-  SYMPTOMS.forEach(sym=>{
-    const el = document.querySelector('#s-' + sym.replace(/\s+/g,'_'));
-    if(el && el.checked) selected.push(sym);
-  });
-  // include free text keywords (naive)
-  const free = document.getElementById('freeText').value.toLowerCase();
-  if(free){
-    SYMPTOMS.forEach(sym=>{
-      if(free.includes(sym) && !selected.includes(sym)) selected.push(sym);
-    });
-    // common words mapping
-    if(free.includes('sweat') || free.includes('sweating')) { if(!selected.includes('dizziness')) selected.push('dizziness'); }
-    if(free.includes('sneeze') && !selected.includes('runny nose')) selected.push('runny nose');
-  }
-  return selected;
-}
-
-// scoring function: sum of weights for matched symptoms, normalized by max possible for that condition
-function scoreConditions(selected, age, sex, duration, severity){
-  const results = [];
-  CONDITIONS.forEach(cond=>{
-    let score = 0;
-    let max = 0;
-    for(const [sym,w] of Object.entries(cond.weights)){
-      max += w;
-      if(selected.includes(sym)) score += w;
+      document.getElementById("results").innerHTML =
+        "<ul>" + conditions.map(c => `<li>${c}</li>`).join("") + "</ul>";
     }
-    const normalized = max>0 ? (score / max) : 0;
-    // adjust for severity/duration heuristics (demo)
-    let modifier = 1;
-    if(severity === 'severe') modifier += 0.15;
-    if(duration === '0-1') modifier *= 1.0;
-    if(duration === '14+') modifier *= 0.95;
-    const finalScore = Math.min(1, normalized * modifier);
-    results.push({ id: cond.id, name: cond.name, score: finalScore, description: cond.description, advice: cond.advice });
-  });
-  // sort by score desc
-  results.sort((a,b)=>b.score - a.score);
-  return results;
-}
 
-// emergency detection
-function hasEmergency(selected, freeText){
-  const txt = freeText.toLowerCase();
-  for(const e of EMERGENCY_SYMPTOMS){
-    if(selected.includes(e) || txt.includes(e)) return true;
-  }
-  // also if free text mentions "passing out", "unconscious", "severe chest pain"
-  if(txt.includes('passing out') || txt.includes('unconscious') || txt.includes('severe chest pain')) return true;
-  return false;
-}
+    function addDiaryEntry() {
+      const date = document.getElementById("diaryDate").value;
+      const symptoms = document.getElementById("diarySymptoms").value;
 
-// UI actions
-document.getElementById('checkBtn').addEventListener('click', ()=> {
-  const age = parseInt(document.getElementById('age').value) || null;
-  const sex = document.getElementById('sex').value;
-  const duration = document.getElementById('duration').value;
-  const severity = document.getElementById('severity').value;
-  const freeText = document.getElementById('freeText').value || '';
-  const selected = getSelectedSymptoms();
+      if (!date || !symptoms) {
+        alert("Please enter both date and symptoms.");
+        return;
+      }
 
-  // emergency check
-  const emergency = hasEmergency(selected, freeText);
-  document.getElementById('emergencyBox').style.display = emergency ? 'block' : 'none';
+      const log = document.getElementById("diaryLog");
+      const entry = document.createElement("div");
+      entry.className = "diary-entry";
+      entry.innerHTML = `<strong>${date}</strong>: ${symptoms}`;
+      log.appendChild(entry);
 
-  const results = scoreConditions(selected, age, sex, duration, severity);
-  renderResults(results, selected, emergency);
-});
-
-document.getElementById('clearBtn').addEventListener('click', ()=> {
-  document.getElementById('age').value=''; document.getElementById('sex').value='unknown'; document.getElementById('duration').value='1-3'; document.getElementById('severity').value='mild';
-  SYMPTOMS.forEach(sym=>{ const el = document.querySelector('#s-'+sym.replace(/\s+/g,'_')); if(el) el.checked=false; });
-  document.getElementById('freeText').value='';
-  document.getElementById('resultsArea').innerHTML = '<div class="small muted">No check performed yet. Enter symptoms and press <strong>Check Possible Conditions</strong>.</div>';
-  document.getElementById('emergencyBox').style.display='none';
-});
-
-// render results
-function renderResults(results, selectedSymptoms, emergency){
-  const area = document.getElementById('resultsArea');
-  area.innerHTML = '';
-
-  // quick summary block
-  const summary = document.createElement('div');
-  summary.className = 'card';
-  summary.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div>
-    <div style="font-weight:800">Summary</div>
-    <div class="muted small">${selectedSymptoms.length} symptom(s) selected</div>
-    </div>
-    <div style="text-align:right"><div class="small muted">Confidence</div><div style="font-weight:900">${(results[0].score*100).toFixed(0)}%</div></div>
-  </div>`;
-  area.appendChild(summary);
-
-  // show top 5 conditions
-  const top = results.slice(0,5);
-  top.forEach(r => {
-    const cond = document.createElement('div');
-    cond.className = 'condition';
-    cond.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-      <div style="font-weight:800">${r.name}</div>
-      <div class="score">${Math.round(r.score*100)}%</div>
-    </div>
-    <div class="muted small" style="margin-top:6px">${r.description}</div>
-    <div style="margin-top:8px"><strong>Why this might match:</strong> ${explainMatch(r, selectedSymptoms)}</div>
-    <div class="next-steps" style="margin-top:8px"><strong>Next steps:</strong> ${r.advice}</div>
-    `;
-    area.appendChild(cond);
-  });
-
-  // general advice panel
-  const gen = document.createElement('div');
-  gen.className = 'card';
-  const action = emergency ? '<div style="color:var(--danger);font-weight:900">Emergency signs detected — call emergency services now.</div>' : adviceBySeverity(results[0].score);
-  gen.innerHTML = `<div style="font-weight:800">General Guidance</div>
-    <div class="muted small" style="margin-top:8px">This tool does not replace clinical judgment. Use the guidance below as a general starting point.</div>
-    <div style="margin-top:10px">${action}</div>
-    <div style="margin-top:8px" class="small muted">If symptoms get worse, new alarming symptoms appear, or you are unsure — contact a healthcare professional or urgent care.</div>`;
-  area.appendChild(gen);
-}
-
-// small explanation builder
-function explainMatch(result, selected){
-  const cond = CONDITIONS.find(c=>c.id===result.id);
-  if(!cond) return '';
-  const matched = [];
-  for(const sym of Object.keys(cond.weights)){
-    if(selected.includes(sym)) matched.push(sym);
-  }
-  if(matched.length===0) return 'Few direct symptom matches; this condition appears lower likelihood.';
-  return 'Matched symptoms: ' + matched.map(s=>s[0].toUpperCase()+s.slice(1)).join(', ');
-}
-
-// advice selector based on top score
-function adviceBySeverity(topScore){
-  if(topScore >= 0.8) return '<div style="color:var(--ok);font-weight:800">High match: See a healthcare provider soon for evaluation.</div>';
-  if(topScore >= 0.5) return '<div style="color:#b45309;font-weight:800">Moderate match: Arrange a primary care appointment; self-care while monitoring.</div>';
-  return '<div style="color:#0b7285;font-weight:800">Low match: Symptoms may be minor; rest, fluids, monitor. Seek care if not improving.</div>';
-}
-
-// export + print
-document.getElementById('exportBtn').addEventListener('click', ()=>{
-  const report = {
-    timestamp: new Date().toISOString(),
-    age: document.getElementById('age').value || null,
-    sex: document.getElementById('sex').value,
-    symptoms: getSelectedSymptoms(),
-    freeText: document.getElementById('freeText').value.trim()
-  };
-  const blob = new Blob([JSON.stringify(report, null, 2)], {type:'application/json'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'symptom_report.json'; a.click();
-});
-document.getElementById('printBtn').addEventListener('click', ()=> window.print());
-
-/* initial hint */
-document.getElementById('resultsArea').innerHTML = '<div class="small muted">No check performed yet. Enter symptoms and press <strong>Check Possible Conditions</strong>.</div>';
-</script>
+      // Reset fields
+      document.getElementById("diaryDate").value = "";
+      document.getElementById("diarySymptoms").value = "";
+    }
+  </script>
 </body>
 </html>
