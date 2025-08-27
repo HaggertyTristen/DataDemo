@@ -1,197 +1,297 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>My Health Tracker</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-  body {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0; padding: 0;
-    background: #f5f7fa;
-    color: #2c3e50;
-  }
-  header {
-    background: #6ab04c;
-    color: white;
-    padding: 20px;
-    font-size: 1.8em;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  .cards {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-  .card {
-    background: white;
-    padding: 15px 20px;
-    border-radius: 10px;
-    flex: 1;
-    min-width: 150px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-  }
-  .card h3 { margin: 0; font-weight: 600; }
-  .progress-bar {
-    background: #e0e0e0;
-    border-radius: 6px;
-    height: 10px;
-    margin-top: 5px;
-  }
-  .progress-fill {
-    height: 100%;
-    background: #6ab04c;
-    width: 0%;
-    border-radius: 6px;
-  }
-  .charts { display: flex; gap: 20px; flex-wrap: wrap; }
-  canvas { background: white; border-radius: 10px; padding: 10px; flex: 1 1 300px; }
-  .inputs { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  .inputs input { padding: 8px; border-radius: 6px; border: 1px solid #ccc; width: 100px; }
-  .inputs button { padding: 10px 20px; border: none; background: #6ab04c; color: white; border-radius: 6px; cursor: pointer; }
-  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-  th, td { padding: 8px; text-align: center; border: 1px solid #ccc; }
-  th { background: #6ab04c; color: white; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Health Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background: #f4f7f8;
+      color: #333;
+    }
+
+    header {
+      background: #4CAF50;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    main {
+      display: flex;
+      gap: 2rem;
+      padding: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .tracker, .calendar {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      flex: 1 1 400px;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #4CAF50;
+    }
+
+    label {
+      display: block;
+      margin: 0.5rem 0 0.2rem;
+    }
+
+    input[type="number"], input[type="date"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 0.7rem 1.2rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    .progress-container {
+      margin: 1rem 0;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+    }
+
+    .progress-bar {
+      width: 100%;
+      background: #eee;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    .progress-bar-fill {
+      height: 20px;
+      width: 0%;
+      background: #4CAF50;
+      text-align: right;
+      padding-right: 0.5rem;
+      line-height: 20px;
+      color: white;
+      border-radius: 8px 0 0 8px;
+      transition: width 0.5s;
+    }
+
+    .calendar table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .calendar th, .calendar td {
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    .calendar th {
+      background: #f0f0f0;
+    }
+
+    .logged {
+      background: #d4edda;
+      color: #155724;
+      font-weight: bold;
+      border-radius: 50%;
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+    }
+
+    .goal-container {
+      margin-bottom: 1rem;
+      background: #e8f5e9;
+      padding: 1rem;
+      border-radius: 10px;
+    }
+
+    .goal-container h3 {
+      margin-top: 0;
+      font-size: 1rem;
+      color: #2e7d32;
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <span>My Health Tracker</span>
-  <label class="switch">
-    <input type="checkbox">
-    <span>Toggle</span>
-  </label>
-</header>
+  <header>
+    <h1>Health Tracker</h1>
+  </header>
 
-<div class="container">
+  <main>
+    <!-- Tracker Section -->
+    <div class="tracker">
+      <h2>Log Your Daily Health</h2>
 
-  <!-- Progress Cards -->
-  <div class="cards">
-    <div class="card">
-      <h3>Steps</h3>
-      <p id="stepsValue">8,500</p>
-      <div class="progress-bar"><div class="progress-fill" id="stepsProgress" style="width: 85%;"></div></div>
-      <small>10,000 steps</small>
+      <!-- Goals Section -->
+      <div class="goal-container">
+        <h3>Edit Your Goals</h3>
+        <label for="goalSteps">Steps Goal</label>
+        <input type="number" id="goalSteps" value="10000">
+        <label for="goalWater">Water Goal (cups)</label>
+        <input type="number" id="goalWater" value="8">
+        <label for="goalSleep">Sleep Goal (hours)</label>
+        <input type="number" id="goalSleep" value="8">
+        <button onclick="updateGoals()">Update Goals</button>
+      </div>
+
+      <label for="date">Date</label>
+      <input type="date" id="date">
+
+      <label for="steps">Steps</label>
+      <input type="number" id="steps" placeholder="Enter steps">
+
+      <label for="water">Water (cups)</label>
+      <input type="number" id="water" placeholder="Enter cups of water">
+
+      <label for="sleep">Sleep (hours)</label>
+      <input type="number" id="sleep" placeholder="Enter sleep hours">
+
+      <button onclick="logHealth()">Log Entry</button>
+
+      <div class="progress-container">
+        <div class="progress-label">Steps Progress</div>
+        <div class="progress-bar"><div class="progress-bar-fill" id="stepsProgress">0%</div></div>
+
+        <div class="progress-label">Water Progress</div>
+        <div class="progress-bar"><div class="progress-bar-fill" id="waterProgress">0%</div></div>
+
+        <div class="progress-label">Sleep Progress</div>
+        <div class="progress-bar"><div class="progress-bar-fill" id="sleepProgress">0%</div></div>
+      </div>
     </div>
-    <div class="card">
-      <h3>Water</h3>
-      <p id="waterValue">6 cups</p>
-      <div class="progress-bar"><div class="progress-fill" id="waterProgress" style="width: 75%;"></div></div>
-      <small>7.5% goal</small>
+
+    <!-- Calendar Section -->
+    <div class="calendar">
+      <h2>Monthly Calendar</h2>
+      <table id="calendarTable">
+        <thead>
+          <tr>
+            <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+          </tr>
+        </thead>
+        <tbody id="calendarBody">
+          <!-- Calendar will be generated here -->
+        </tbody>
+      </table>
     </div>
-    <div class="card">
-      <h3>Sleep</h3>
-      <p id="sleepValue">7 hrs</p>
-      <div class="progress-bar"><div class="progress-fill" id="sleepProgress" style="width: 87%;"></div></div>
-      <small>87% goal</small>
-    </div>
-    <div class="card">
-      <h3>Calories</h3>
-      <p id="caloriesValue">1,800</p>
-      <div class="progress-bar"><div class="progress-fill" id="caloriesProgress" style="width: 90%;"></div></div>
-      <small>2,000 goal</small>
-    </div>
-  </div>
+  </main>
 
-  <!-- Charts -->
-  <div class="charts">
-    <canvas id="stepsChart" height="200"></canvas>
-    <canvas id="waterChart" height="200"></canvas>
-    <canvas id="sleepPie" height="200"></canvas>
-  </div>
+  <script>
+    let goals = {
+      steps: parseInt(document.getElementById('goalSteps').value),
+      water: parseInt(document.getElementById('goalWater').value),
+      sleep: parseInt(document.getElementById('goalSleep').value)
+    };
 
-  <!-- Inputs -->
-  <div class="card inputs">
-    <input type="number" id="inputSteps" placeholder="Steps">
-    <input type="number" id="inputWater" placeholder="Water (cups)">
-    <input type="number" id="inputSleep" placeholder="Sleep (hrs)">
-    <input type="number" id="inputCalories" placeholder="Calories">
-    <button onclick="addEntry()">Add Entry</button>
-  </div>
+    let logs = {};
 
-  <!-- History Table -->
-  <div class="card">
-    <h3>History</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th><th>Steps</th><th>Water</th><th>Sleep</th><th>Calories</th><th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="historyTable"></tbody>
-    </table>
-  </div>
+    function updateGoals() {
+      goals.steps = parseInt(document.getElementById('goalSteps').value) || 10000;
+      goals.water = parseInt(document.getElementById('goalWater').value) || 8;
+      goals.sleep = parseInt(document.getElementById('goalSleep').value) || 8;
 
-</div>
+      // Update progress if today's entry exists
+      const today = document.getElementById('date').value;
+      if (logs[today]) {
+        updateProgress(logs[today].steps, logs[today].water, logs[today].sleep);
+      }
+      alert("Goals updated!");
+    }
 
-<script>
-let history = [
-  {date:'2025-08-25',steps:8500,water:6,sleep:5,calories:2000},
-  {date:'2025-08-24',steps:16000,water:6,sleep:6,calories:1800},
-  {date:'2025-08-23',steps:7800,water:5,sleep:5,calories:1700},
-  {date:'2025-08-22',steps:2000,water:3,sleep:2,calories:1400},
-];
+    function logHealth() {
+      const date = document.getElementById('date').value;
+      const steps = parseInt(document.getElementById('steps').value) || 0;
+      const water = parseInt(document.getElementById('water').value) || 0;
+      const sleep = parseInt(document.getElementById('sleep').value) || 0;
 
-function updateHistoryTable(){
-  const tbody = document.getElementById('historyTable');
-  tbody.innerHTML = '';
-  history.forEach((entry,i)=>{
-    const row = document.createElement('tr');
-    row.innerHTML = `<td>${entry.date}</td><td>${entry.steps}</td><td>${entry.water}</td><td>${entry.sleep}</td><td>${entry.calories}</td><td>Edit Delete</td>`;
-    tbody.appendChild(row);
-  });
-}
-updateHistoryTable();
+      if (!date) {
+        alert("Please select a date!");
+        return;
+      }
 
-function addEntry(){
-  const today = new Date().toISOString().split('T')[0];
-  const steps = parseInt(document.getElementById('inputSteps').value)||0;
-  const water = parseInt(document.getElementById('inputWater').value)||0;
-  const sleep = parseInt(document.getElementById('inputSleep').value)||0;
-  const calories = parseInt(document.getElementById('inputCalories').value)||0;
-  history.unshift({date: today, steps, water, sleep, calories});
-  updateHistoryTable();
-  document.getElementById('inputSteps').value='';
-  document.getElementById('inputWater').value='';
-  document.getElementById('inputSleep').value='';
-  document.getElementById('inputCalories').value='';
-}
+      logs[date] = { steps, water, sleep };
+      updateProgress(steps, water, sleep);
+      renderCalendar();
+    }
 
-// Charts
-const stepsChart = new Chart(document.getElementById('stepsChart').getContext('2d'),{
-  type:'line',
-  data:{
-    labels: history.map(e=>e.date),
-    datasets:[{label:'Steps',data:history.map(e=>e.steps),borderColor:'#3498db',fill:false}]
-  }
-});
-const waterChart = new Chart(document.getElementById('waterChart').getContext('2d'),{
-  type:'bar',
-  data:{
-    labels: history.map(e=>e.date),
-    datasets:[{label:'Water',data:history.map(e=>e.water),backgroundColor:'#5dade2'}]
-  }
-});
-const sleepPie = new Chart(document.getElementById('sleepPie').getContext('2d'),{
-  type:'pie',
-  data:{
-    labels:['Deep','Light'],
-    datasets:[{data:[2,5],backgroundColor:['#2e86de','#85c1e9'] }]
-  }
-});
-</script>
+    function updateProgress(steps, water, sleep) {
+      document.getElementById('stepsProgress').style.width = Math.min((steps/goals.steps)*100,100) + '%';
+      document.getElementById('stepsProgress').textContent = Math.min((steps/goals.steps)*100,100).toFixed(0) + '%';
+
+      document.getElementById('waterProgress').style.width = Math.min((water/goals.water)*100,100) + '%';
+      document.getElementById('waterProgress').textContent = Math.min((water/goals.water)*100,100).toFixed(0) + '%';
+
+      document.getElementById('sleepProgress').style.width = Math.min((sleep/goals.sleep)*100,100) + '%';
+      document.getElementById('sleepProgress').textContent = Math.min((sleep/goals.sleep)*100,100).toFixed(0) + '%';
+    }
+
+    function renderCalendar() {
+      const calendarBody = document.getElementById('calendarBody');
+      calendarBody.innerHTML = '';
+
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      let row = document.createElement('tr');
+      for (let i = 0; i < firstDay; i++) {
+        row.appendChild(document.createElement('td'));
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        if (row.children.length === 7) {
+          calendarBody.appendChild(row);
+          row = document.createElement('tr');
+        }
+        const cell = document.createElement('td');
+        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+
+        if (logs[dateStr]) {
+          cell.innerHTML = `<span class="logged" title="Steps: ${logs[dateStr].steps}, Water: ${logs[dateStr].water}, Sleep: ${logs[dateStr].sleep}">${day}</span>`;
+        } else {
+          cell.textContent = day;
+        }
+
+        row.appendChild(cell);
+      }
+
+      while(row.children.length < 7) {
+        row.appendChild(document.createElement('td'));
+      }
+      calendarBody.appendChild(row);
+    }
+
+    renderCalendar();
+  </script>
 
 </body>
 </html>
