@@ -8,122 +8,218 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      background: #f3f6fa;
+      background: #f0f4f8;
       color: #333;
     }
-
     header {
-      background: #1e88e5;
+      background: #1e90ff;
       color: white;
-      padding: 1.5rem;
+      padding: 20px;
       text-align: center;
-      font-size: 1.8rem;
+      font-size: 1.8em;
       font-weight: bold;
-      letter-spacing: 1px;
     }
-
-    .dashboard {
-      display: flex;
-      justify-content: center;
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 20px;
       padding: 20px;
     }
-
-    .current-weather {
-      flex: 1;
-      max-width: 350px;
+    .card {
       background: white;
       border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       padding: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.2em;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 8px;
+      color: #1e90ff;
+    }
+    #cityForm {
       text-align: center;
+      margin: 20px;
     }
-
-    .current-weather h2 {
-      margin-bottom: 10px;
-      font-size: 1.4rem;
+    #cityInput {
+      padding: 8px;
+      width: 200px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
-
-    .temp {
-      font-size: 3rem;
-      font-weight: bold;
-      margin: 10px 0;
-      color: #1e88e5;
+    button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #1e90ff;
+      color: white;
+      cursor: pointer;
+      margin-left: 8px;
     }
-
-    .forecast {
-      flex: 2;
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 15px;
+    button:hover {
+      background: #0066cc;
     }
-
-    .day {
-      background: white;
-      border-radius: 12px;
-      padding: 15px;
+    .forecast-grid {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+    }
+    .forecast-day {
+      flex: 0 0 100px;
       text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 10px;
     }
-
-    .day h3 {
-      font-size: 1rem;
-      margin-bottom: 5px;
-      color: #1e88e5;
+    .hourly-grid {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
     }
-
-    .day .temp {
-      font-size: 1.2rem;
-      color: #333;
-    }
-
-    .icon {
-      font-size: 2rem;
-      margin: 10px 0;
+    .hour {
+      flex: 0 0 80px;
+      text-align: center;
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 8px;
     }
   </style>
 </head>
 <body>
-  <header>🌤 Weather Dashboard</header>
+  <header>🌤️ Weather Dashboard</header>
 
-  <div class="dashboard">
-    <!-- Current Weather -->
-    <div class="current-weather">
-      <h2>Orlando, FL</h2>
-      <div class="icon">☀️</div>
-      <div class="temp">84°F</div>
-      <p>Sunny</p>
-      <p>Humidity: 45% | Wind: 6 mph</p>
+  <div id="cityForm">
+    <input type="text" id="cityInput" placeholder="Enter city (e.g., Miami)">
+    <button onclick="getWeather()">Search</button>
+  </div>
+
+  <div class="container">
+    <!-- Left Column -->
+    <div>
+      <div class="card" id="currentWeather">
+        <h2>Current Weather</h2>
+        <p>Loading...</p>
+      </div>
+      <div class="card" id="hourlyForecast">
+        <h2>Hourly Forecast</h2>
+        <div class="hourly-grid" id="hourlyGrid"></div>
+      </div>
+      <div class="card" id="sunTimes">
+        <h2>Sunrise & Sunset</h2>
+        <p>Loading...</p>
+      </div>
     </div>
 
-    <!-- 5 Day Forecast -->
-    <div class="forecast">
-      <div class="day">
-        <h3>Mon</h3>
-        <div class="icon">🌤</div>
-        <div class="temp">82°F</div>
+    <!-- Right Column -->
+    <div>
+      <div class="card" id="fiveDayForecast">
+        <h2>5-Day Forecast</h2>
+        <div class="forecast-grid" id="forecastGrid"></div>
       </div>
-      <div class="day">
-        <h3>Tue</h3>
-        <div class="icon">⛅</div>
-        <div class="temp">80°F</div>
+      <div class="card" id="alerts">
+        <h2>Weather Alerts</h2>
+        <p>No alerts.</p>
       </div>
-      <div class="day">
-        <h3>Wed</h3>
-        <div class="icon">🌧</div>
-        <div class="temp">77°F</div>
+      <div class="card" id="aqi">
+        <h2>Air Quality Index</h2>
+        <p>Loading...</p>
       </div>
-      <div class="day">
-        <h3>Thu</h3>
-        <div class="icon">⛈</div>
-        <div class="temp">75°F</div>
+      <div class="card" id="uvIndex">
+        <h2>UV Index</h2>
+        <p>Loading...</p>
       </div>
-      <div class="day">
-        <h3>Fri</h3>
-        <div class="icon">☀️</div>
-        <div class="temp">85°F</div>
+      <div class="card" id="recommendations">
+        <h2>Recommendations</h2>
+        <p>Loading...</p>
       </div>
     </div>
   </div>
+
+  <script>
+    const apiKey = "YOUR_API_KEY"; // 🔑 Replace with OpenWeatherMap API key
+    let defaultCity = "Boca Raton";
+
+    async function getWeather(city = defaultCity) {
+      const weatherRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`);
+      const weatherData = await weatherRes.json();
+
+      document.getElementById("currentWeather").innerHTML = `
+        <h2>Current Weather - ${weatherData.name}</h2>
+        <p>🌡️ Temp: ${weatherData.main.temp}°F</p>
+        <p>☁️ Condition: ${weatherData.weather[0].description}</p>
+        <p>💨 Wind: ${weatherData.wind.speed} mph</p>
+        <p>💧 Humidity: ${weatherData.main.humidity}%</p>
+      `;
+
+      document.getElementById("sunTimes").innerHTML = `
+        <h2>Sunrise & Sunset</h2>
+        <p>🌅 Sunrise: ${new Date(weatherData.sys.sunrise * 1000).toLocaleTimeString()}</p>
+        <p>🌇 Sunset: ${new Date(weatherData.sys.sunset * 1000).toLocaleTimeString()}</p>
+      `;
+
+      // Fetch 5-day forecast
+      const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=imperial&appid=${apiKey}`);
+      const forecastData = await forecastRes.json();
+
+      const forecastGrid = document.getElementById("forecastGrid");
+      forecastGrid.innerHTML = "";
+      for (let i = 0; i < forecastData.list.length; i += 8) {
+        const day = forecastData.list[i];
+        forecastGrid.innerHTML += `
+          <div class="forecast-day">
+            <p>${new Date(day.dt * 1000).toLocaleDateString()}</p>
+            <p>🌡️ ${day.main.temp}°F</p>
+            <p>${day.weather[0].main}</p>
+          </div>
+        `;
+      }
+
+      // Hourly forecast (first 12 hours)
+      const hourlyGrid = document.getElementById("hourlyGrid");
+      hourlyGrid.innerHTML = "";
+      for (let i = 0; i < 12; i++) {
+        const hour = forecastData.list[i];
+        hourlyGrid.innerHTML += `
+          <div class="hour">
+            <p>${new Date(hour.dt * 1000).getHours()}:00</p>
+            <p>${hour.main.temp}°F</p>
+            <p>${hour.weather[0].main}</p>
+          </div>
+        `;
+      }
+
+      // Air Quality Index (requires coordinates)
+      const { lon, lat } = weatherData.coord;
+      const airRes = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`);
+      const airData = await airRes.json();
+      const aqiVal = airData.list[0].main.aqi;
+      const aqiLevels = ["Good", "Fair", "Moderate", "Poor", "Very Poor"];
+      document.getElementById("aqi").innerHTML = `
+        <h2>Air Quality Index</h2>
+        <p>${aqiVal} - ${aqiLevels[aqiVal - 1]}</p>
+      `;
+
+      // UV Index
+      const uvRes = await fetch(`https://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=${apiKey}`);
+      const uvData = await uvRes.json();
+      document.getElementById("uvIndex").innerHTML = `
+        <h2>UV Index</h2>
+        <p>${uvData.value}</p>
+      `;
+
+      // Recommendations
+      let rec = "Enjoy your day!";
+      if (weatherData.weather[0].main.includes("Rain")) rec = "☔ Don’t forget an umbrella!";
+      else if (uvData.value > 7) rec = "🧴 High UV! Wear sunscreen.";
+      else if (aqiVal >= 4) rec = "😷 Air quality is bad, limit outdoor activities.";
+      document.getElementById("recommendations").innerHTML = `
+        <h2>Recommendations</h2>
+        <p>${rec}</p>
+      `;
+    }
+
+    getWeather();
+  </script>
 </body>
 </html>
