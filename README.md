@@ -9,3 +9,5 @@ https://safestep-step-into-safet-af0ieei.gamma.site/
 NEW
 https://safestep-ai-powered-land-y2ztk0t.gamma.site/
 [https://safestep-4upghho.gamma.site/](https://safestep-nrcb44p.gamma.site/)
+https://colab.research.google.com/drive/1rBSQ1JBTU8JoPpZONxKyPnilD_HaC0hW?authuser=0#scrollTo=C3kGpmlt5YgU
+[SafeStep Poster.pptx](https://github.com/user-attachments/files/23534887/SafeStep.Poster.pptx)
